@@ -22,46 +22,67 @@
 
     <div id="chairLinks" class="d-none">
         <div class="section-title">CHAIRPERSON</div>
-        <a href="/frontend/dashboards/chairperson/overview.html">Overview</a>
-        <a href="/frontend/dashboards/chairperson/approval.html">Approvals</a>
-        <a href="/frontend/dashboards/chairperson/financial-summary.html">Financial Summary</a>
-        <a href="/frontend/dashboards/chairperson/report.html">Reports</a>
-        <a href="/frontend/dashboards/chairperson/shareout.html">Share Out</a>
+        <a href="#" data-path="dashboards/chairperson/overview.html">Overview</a>
+        <a href="#" data-path="dashboards/chairperson/approval.html">Approvals</a>
+        <a href="#" data-path="dashboards/chairperson/financial-summary.html">Financial Summary</a>
+        <a href="#" data-path="dashboards/chairperson/report.html">Reports</a>
+        <a href="#" data-path="dashboards/chairperson/shareout.html">Share Out</a>
     </div>
 
     <div id="treasurerLinks" class="d-none">
         <div class="section-title">TREASURER</div>
-        <a href="/frontend/dashboards/treasurer/contribution.html">Contributions</a>
-        <a href="/frontend/dashboards/treasurer/loan.html">Loans</a>
-        <a href="/frontend/dashboards/treasurer/repayment.html">Repayments</a>
-        <a href="/frontend/dashboards/treasurer/interest.html">Interest</a>
-        <a href="/frontend/dashboards/treasurer/reports.html">Reports</a>
-        <a href="/frontend/dashboards/treasurer/shareout.html">Share Out</a>
+        <a href="#" data-path="dashboards/treasurer/contribution.html">Contributions</a>
+        <a href="#" data-path="dashboards/treasurer/loan.html">Loans</a>
+        <a href="#" data-path="dashboards/treasurer/repayment.html">Repayments</a>
+        <a href="#" data-path="dashboards/treasurer/interest.html">Interest</a>
+        <a href="#" data-path="dashboards/treasurer/reports.html">Reports</a>
+        <a href="#" data-path="dashboards/treasurer/shareout.html">Share Out</a>
     </div>
 
     <div id="memberLinks" class="d-none">
         <div class="section-title">MEMBER</div>
-        <a href="/frontend/dashboards/member/profile.html">My Profile</a>
-        <a href="/frontend/dashboards/member/contribution.html">My Contributions</a>
-        <a href="/frontend/dashboards/member/loan.html">My Loans</a>
-        <a href="/frontend/dashboards/member/repayments.html">My Repayments</a>
-        <a href="/frontend/dashboards/member/statements.html">Statements</a>
+        <a href="#" data-path="dashboards/member/profile.html">My Profile</a>
+        <a href="#" data-path="dashboards/member/contribution.html">My Contributions</a>
+        <a href="#" data-path="dashboards/member/loan.html">My Loans</a>
+        <a href="#" data-path="dashboards/member/repayments.html">My Repayments</a>
+        <a href="#" data-path="dashboards/member/statements.html">Statements</a>
     </div>
 
     <div class="mt-4">
-        <a href="/frontend/index.html" class="d-block">Sign out</a>
+        <a href="#" id="signOutLink" class="d-block">Sign out</a>
     </div>
 
     <script>
+        // Compute a base path that points to the frontend root on deployed host
+        function computeBase() {
+            const parts = window.location.pathname.split('/');
+            const idx = parts.indexOf('frontend');
+            if (idx >= 0) return window.location.origin + parts.slice(0, idx + 1).join('/');
+            // fallback: assume current directory is frontend
+            return window.location.origin + parts.slice(0, parts.length - 1).join('/');
+        }
+
         // Set dashboard link according to stored role and reveal role sections
         (function(){
+            const base = computeBase();
             const role = sessionStorage.getItem('chama_user_role') || '';
             const dashboardLink = document.getElementById('dashboardLink');
             if (role) {
-                dashboardLink.href = `/frontend/dashboards/${role}/dashboard.html`;
+                dashboardLink.href = `${base}/dashboards/${role}/dashboard.html`;
             } else {
-                dashboardLink.href = '/frontend/index.html';
+                dashboardLink.href = `${base}/index.html`;
             }
+
+            // Populate all data-path anchors with computed base
+            document.querySelectorAll('[data-path]').forEach(a => {
+                const path = a.getAttribute('data-path');
+                a.href = `${base}/${path}`;
+            });
+
+            // Sign out link
+            const signOut = document.getElementById('signOutLink');
+            signOut.href = `${base}/index.html`;
+
             if (role === 'chairperson') document.getElementById('chairLinks').classList.remove('d-none');
             if (role === 'treasurer') document.getElementById('treasurerLinks').classList.remove('d-none');
             if (role === 'member') document.getElementById('memberLinks').classList.remove('d-none');

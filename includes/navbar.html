@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
     <div class="container-fluid">
-        <a class="navbar-brand" href="/frontend/index.html"><i class="fas fa-users"></i> Chama Suite</a>
+        <a class="navbar-brand" id="brandLink" href="#"><i class="fas fa-users"></i> Chama Suite</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -8,10 +8,10 @@
         <div class="collapse navbar-collapse" id="mainNav">
             <ul class="navbar-nav ms-auto align-items-center">
                 <li class="nav-item">
-                    <a id="navDashboard" class="nav-link" href="/frontend/index.html">Dashboard</a>
+                    <a id="navDashboard" class="nav-link" href="#">Dashboard</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/frontend/registration.html">Register</a>
+                    <a id="navRegister" class="nav-link" href="#">Register</a>
                 </li>
                 <li class="nav-item">
                     <a id="navUserName" class="nav-link d-none" href="#"></a>
@@ -22,13 +22,27 @@
 </nav>
 
 <script>
+    function computeBase() {
+        const parts = window.location.pathname.split('/');
+        const idx = parts.indexOf('frontend');
+        if (idx >= 0) return window.location.origin + parts.slice(0, idx + 1).join('/');
+        return window.location.origin + parts.slice(0, parts.length - 1).join('/');
+    }
+
     (function(){
+        const base = computeBase();
         const role = sessionStorage.getItem('chama_user_role');
         const name = sessionStorage.getItem('chama_user_name');
         const navDashboard = document.getElementById('navDashboard');
         const navUser = document.getElementById('navUserName');
-        if (role) navDashboard.href = `/frontend/dashboards/${role}/dashboard.html`;
-        else navDashboard.href = '/frontend/index.html';
+        const navRegister = document.getElementById('navRegister');
+        const brandLink = document.getElementById('brandLink');
+
+        if (role) navDashboard.href = `${base}/dashboards/${role}/dashboard.html`;
+        else navDashboard.href = `${base}/index.html`;
+        navRegister.href = `${base}/registration.html`;
+        brandLink.href = `${base}/index.html`;
+
         if (name) { navUser.textContent = name; navUser.classList.remove('d-none'); }
     })();
 </script>
