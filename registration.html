@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register | Chama Management Suite</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="index.css">
+</head>
+
+<body class="bg-light">
+  <div class="container mt-4">
+    <div class="row justify-content-center">
+      <div class="col-md-7">
+
+        <!-- Chama Title -->
+        <div class="chama-title mb-4">
+          <i class="fas fa-users me-2"></i>Chama<span>Suite</span>
+        </div>
+
+        <div class="auth-container">
+          <div class="auth-card">
+            <div class="auth-header">
+              <h4><i class="fas fa-user-plus me-2"></i>Create New Account</h4>
+              <p>Join the Chama Management Suite</p>
+            </div>
+
+            <div class="card-body p-4">
+              <form id="registerForm" novalidate>
+                <div class="row">
+                  <!-- Full Name -->
+                  <div class="col-md-6">
+                    <div class="input-group">
+                      <label for="full_name" class="form-label">Full Name *</label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        <input type="text" class="form-control" id="full_name" placeholder="John Doe" required>
+                      </div>
+                      <div class="validation-message text-danger" id="nameError"></div>
+                    </div>
+                  </div>
+
+                  <!-- Email -->
+                  <div class="col-md-6">
+                    <div class="input-group">
+                      <label for="email" class="form-label">Email Address *</label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                        <input type="email" class="form-control" id="email" placeholder="john@example.com" required>
+                      </div>
+                      <div class="validation-message text-danger" id="emailError"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row mt-3">
+                  <!-- Phone -->
+                  <div class="col-md-6">
+                    <div class="input-group">
+                      <label for="phone" class="form-label">Phone Number</label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                        <input type="tel" class="form-control" id="phone" placeholder="+254 700 000000">
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Role -->
+                  <div class="col-md-6">
+                    <div class="input-group">
+                      <label for="role" class="form-label">Role *</label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
+                        <select class="form-select" id="role" required>
+                          <option value="">Select Your Role</option>
+                          <option value="member">
+                            <i class="fas fa-user me-2"></i> Member
+                          </option>
+                          <option value="treasurer">
+                            <i class="fas fa-coins me-2"></i> Treasurer
+                          </option>
+                          <option value="secretary">
+                            <i class="fas fa-clipboard-list me-2"></i> Secretary
+                          </option>
+                          <option value="chairperson">
+                            <i class="fas fa-crown me-2"></i> Chairperson
+                          </option>
+                        </select>
+                      </div>
+                      <div class="validation-message text-danger" id="roleError"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Password -->
+                <div class="input-group mt-3">
+                  <label for="password" class="form-label">Password *</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                    <input type="password" class="form-control" id="password" placeholder="Minimum 6 characters"
+                      required minlength="6">
+                    <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </div>
+                  <div class="password-strength" id="passwordStrength"></div>
+                  <div class="validation-message text-danger" id="passwordError"></div>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="input-group mt-3">
+                  <label for="confirmPassword" class="form-label">Confirm Password *</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                    <input type="password" class="form-control" id="confirmPassword"
+                      placeholder="Re-enter your password" required>
+                    <button type="button" class="btn btn-outline-secondary" id="toggleConfirmPassword">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </div>
+                  <div class="validation-message text-danger" id="confirmPasswordError"></div>
+                </div>
+
+                <!-- Terms and Conditions -->
+                <div class="form-check mt-4 mb-4">
+                  <input class="form-check-input" type="checkbox" id="terms" required>
+                  <label class="form-check-label small" for="terms">
+                    I agree to the <a href="#" class="text-decoration-none">Terms of Service</a> and <a href="#"
+                      class="text-decoration-none">Privacy Policy</a>
+                  </label>
+                  <div class="validation-message text-danger" id="termsError"></div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary w-100 mb-3" id="registerBtn">
+                  <i class="fas fa-user-plus me-2"></i>Create Account
+                </button>
+
+                <!-- Loading Spinner -->
+                <div class="text-center d-none" id="loadingSpinner">
+                  <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                  <p class="mt-2">Creating your account...</p>
+                </div>
+
+              </form>
+
+              <!-- Success/Error Messages -->
+              <div class="alert alert-success d-none mt-3" id="successAlert" role="alert">
+                <i class="fas fa-check-circle me-2"></i>
+                <span id="successMessage"></span>
+              </div>
+
+              <div class="alert alert-danger d-none mt-3" id="errorAlert" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <span id="errorMessage"></span>
+              </div>
+
+              <!-- Divider -->
+              <div class="text-center my-4 position-relative">
+                <hr>
+                <span class="bg-white px-3 position-absolute top-50 start-50 translate-middle">Already have an
+                  account?</span>
+              </div>
+
+              <!-- Login Link -->
+              <div class="auth-footer">
+                <a href="index.html" class="btn btn-outline-primary w-100">
+                  <i class="fas fa-sign-in-alt me-2"></i>Login to Existing Account
+                </a>
+                <p class="small text-muted mt-3">
+                  <i class="fas fa-info-circle me-1"></i>
+                  After registration, your account will need approval from an administrator.
+                </p>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script type="module">
+    import { registerUser } from "./supabase/auth.js";
+
+    // DOM Elements
+    const registerForm = document.getElementById('registerForm');
+    const fullNameInput = document.getElementById('full_name');
+    const emailInput = document.getElementById('email');
+    const phoneInput = document.getElementById('phone');
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirmPassword');
+    const roleSelect = document.getElementById('role');
+    const termsCheckbox = document.getElementById('terms');
+    const registerBtn = document.getElementById('registerBtn');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const successAlert = document.getElementById('successAlert');
+    const errorAlert = document.getElementById('errorAlert');
+    const successMessage = document.getElementById('successMessage');
+    const errorMessage = document.getElementById('errorMessage');
+    const passwordStrengthBar = document.getElementById('passwordStrength');
+
+    // Toggle Password Visibility
+    document.getElementById('togglePassword').addEventListener('click', function () {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      this.querySelector('i').classList.toggle('fa-eye');
+      this.querySelector('i').classList.toggle('fa-eye-slash');
+    });
+
+    document.getElementById('toggleConfirmPassword').addEventListener('click', function () {
+      const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      confirmPasswordInput.setAttribute('type', type);
+      this.querySelector('i').classList.toggle('fa-eye');
+      this.querySelector('i').classList.toggle('fa-eye-slash');
+    });
+
+    // Password Strength Checker
+    passwordInput.addEventListener('input', function () {
+      const password = this.value;
+      let strength = 0;
+
+      if (password.length >= 6) strength += 25;
+      if (password.length >= 8) strength += 25;
+      if (/[A-Z]/.test(password)) strength += 25;
+      if (/[0-9]/.test(password)) strength += 25;
+
+      // Update strength bar
+      passwordStrengthBar.style.width = `${strength}%`;
+
+      if (strength < 50) {
+        passwordStrengthBar.style.backgroundColor = '#dc3545'; // Red
+      } else if (strength < 75) {
+        passwordStrengthBar.style.backgroundColor = '#ffc107'; // Yellow
+      } else {
+        passwordStrengthBar.style.backgroundColor = '#28a745'; // Green
+      }
+
+      // Validate password match
+      validatePasswordMatch();
+    });
+
+    // Validate Password Match
+    function validatePasswordMatch() {
+      const password = passwordInput.value;
+      const confirmPassword = confirmPasswordInput.value;
+      const errorElement = document.getElementById('confirmPasswordError');
+
+      if (confirmPassword && password !== confirmPassword) {
+        errorElement.textContent = 'Passwords do not match';
+        errorElement.style.display = 'block';
+        confirmPasswordInput.classList.add('is-invalid');
+        return false;
+      } else if (confirmPassword) {
+        errorElement.style.display = 'none';
+        confirmPasswordInput.classList.remove('is-invalid');
+        return true;
+      }
+      return true;
+    }
+
+    confirmPasswordInput.addEventListener('input', validatePasswordMatch);
+
+    // Form Validation
+    function validateForm() {
+      let isValid = true;
+
+      // Reset all errors
+      document.querySelectorAll('.validation-message').forEach(el => {
+        el.style.display = 'none';
+      });
+
+      document.querySelectorAll('.form-control, .form-select').forEach(el => {
+        el.classList.remove('is-invalid');
+      });
+
+      // Full Name validation
+      if (!fullNameInput.value.trim()) {
+        document.getElementById('nameError').textContent = 'Full name is required';
+        document.getElementById('nameError').style.display = 'block';
+        fullNameInput.classList.add('is-invalid');
+        isValid = false;
+      }
+
+      // Email validation
+      if (!emailInput.value || !emailInput.checkValidity()) {
+        document.getElementById('emailError').textContent = 'Valid email is required';
+        document.getElementById('emailError').style.display = 'block';
+        emailInput.classList.add('is-invalid');
+        isValid = false;
+      }
+
+      // Password validation
+      if (!passwordInput.value || passwordInput.value.length < 6) {
+        document.getElementById('passwordError').textContent = 'Password must be at least 6 characters';
+        document.getElementById('passwordError').style.display = 'block';
+        passwordInput.classList.add('is-invalid');
+        isValid = false;
+      }
+
+      // Confirm Password validation
+      if (!validatePasswordMatch()) {
+        isValid = false;
+      }
+
+      // Role validation
+      if (!roleSelect.value) {
+        document.getElementById('roleError').textContent = 'Please select a role';
+        document.getElementById('roleError').style.display = 'block';
+        roleSelect.classList.add('is-invalid');
+        isValid = false;
+      }
+
+      // Terms validation
+      if (!termsCheckbox.checked) {
+        document.getElementById('termsError').textContent = 'You must agree to the terms';
+        document.getElementById('termsError').style.display = 'block';
+        termsCheckbox.classList.add('is-invalid');
+        isValid = false;
+      }
+
+      return isValid;
+    }
+
+    // Form Submission
+    registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (!validateForm()) return;
+
+      // Show loading state
+      registerBtn.classList.add('d-none');
+      loadingSpinner.classList.remove('d-none');
+      successAlert.classList.add('d-none');
+      errorAlert.classList.add('d-none');
+
+      const formData = {
+        full_name: fullNameInput.value.trim(),
+        email: emailInput.value.trim(),
+        phone: phoneInput.value.trim() || null,
+        password: passwordInput.value,
+        role: roleSelect.value
+      };
+
+      try {
+        // Use Supabase default signup flow (Supabase will send confirmation if enabled)
+        await registerUser(formData);
+
+        // Show success message and redirect to login (frontend index)
+        successMessage.textContent = 'Registration successful! Please check your email for confirmation.';
+        successAlert.classList.remove('d-none');
+
+        // Reset form and UI
+        registerForm.reset();
+        passwordStrengthBar.style.width = '0';
+
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 2500);
+
+      } catch (err) {
+        // Show error
+        errorMessage.textContent = err.message || 'Registration failed. Please try again.';
+        errorAlert.classList.remove('d-none');
+
+        // Reset loading state
+        registerBtn.classList.remove('d-none');
+        loadingSpinner.classList.add('d-none');
+      }
+    });
+
+    // Real-time validation for inputs
+    [fullNameInput, emailInput, roleSelect, termsCheckbox].forEach(input => {
+      input.addEventListener('input', () => {
+        if (input.type === 'checkbox') {
+          if (input.checked) {
+            document.getElementById('termsError').style.display = 'none';
+            input.classList.remove('is-invalid');
+          }
+        } else if (input.value) {
+          const errorId = input.id + 'Error';
+          if (document.getElementById(errorId)) {
+            document.getElementById(errorId).style.display = 'none';
+            input.classList.remove('is-invalid');
+          }
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>

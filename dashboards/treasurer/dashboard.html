@@ -1,0 +1,2305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Treasurer Dashboard | Chama Management Suite</title>
+  
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="treasurer-dashboard.css">
+</head>
+<body>
+  <!-- Treasurer Dashboard Container -->
+  <div class="treasurer-dashboard-container">
+    
+    <!-- Sidebar -->
+    <aside class="treasurer-sidebar" id="treasurerSidebar">
+      <div class="treasurer-sidebar-header">
+        <h3><i class="fas fa-coins"></i> <span class="treasurer-menu-text">Chama Treasury</span></h3>
+        <div class="treasurer-badge">TREASURER</div>
+        <button class="sidebar-toggle" id="treasurerSidebarToggle">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+      </div>
+      
+      <!-- User Info -->
+      <div class="treasurer-user-info">
+        <div class="treasurer-avatar" id="treasurerAvatar">
+          <!-- Initial will be filled by JS -->
+        </div>
+        <div class="treasurer-name" id="treasurerFullName">Loading...</div>
+        <div class="treasurer-role">Treasurer</div>
+        <div class="member-meta mt-2">
+          <div><i class="fas fa-shield-alt"></i> Financial Manager</div>
+        </div>
+      </div>
+      
+      <!-- Sidebar Menu -->
+      <nav class="treasurer-menu">
+        <a href="#dashboard" class="treasurer-menu-item active" data-page="dashboard">
+          <i class="fas fa-tachometer-alt"></i>
+          <span class="treasurer-menu-text">Financial Dashboard</span>
+          <div class="financial-indicator"></div>
+        </a>
+        
+        <a href="#contributions" class="treasurer-menu-item" data-page="contributions">
+          <i class="fas fa-hand-holding-usd"></i>
+          <span class="treasurer-menu-text">Manage Contributions</span>
+          <span class="treasurer-menu-badge" id="pendingContributionsCount">0</span>
+        </a>
+        
+        <a href="#loans" class="treasurer-menu-item" data-page="loans">
+          <i class="fas fa-landmark"></i>
+          <span class="treasurer-menu-text">Loan Disbursement</span>
+          <span class="treasurer-menu-badge" id="pendingLoansCount">0</span>
+        </a>
+        
+        <a href="#repayments" class="treasurer-menu-item" data-page="repayments">
+          <i class="fas fa-money-check-alt"></i>
+          <span class="treasurer-menu-text">Repayments</span>
+          <span class="treasurer-menu-badge" id="overdueRepayments">0</span>
+        </a>
+        
+        <a href="#interest" class="treasurer-menu-item" data-page="interest">
+          <i class="fas fa-percentage"></i>
+          <span class="treasurer-menu-text">Interest Calculation</span>
+        </a>
+        
+        <a href="#shareouts" class="treasurer-menu-item" data-page="shareouts">
+          <i class="fas fa-share-alt"></i>
+          <span class="treasurer-menu-text">Share-out Calculations</span>
+          <span class="treasurer-menu-badge" id="pendingShareouts">0</span>
+        </a>
+        
+        <a href="#reports" class="treasurer-menu-item" data-page="reports">
+          <i class="fas fa-chart-bar"></i>
+          <span class="treasurer-menu-text">Financial Reports</span>
+        </a>
+        
+        <a href="#statements" class="treasurer-menu-item" data-page="statements">
+          <i class="fas fa-file-invoice-dollar"></i>
+          <span class="treasurer-menu-text">Bank Statements</span>
+        </a>
+        
+        <a href="#audit" class="treasurer-menu-item" data-page="audit">
+          <i class="fas fa-clipboard-check"></i>
+          <span class="treasurer-menu-text">Audit Trail</span>
+        </a>
+        
+        <div class="mt-4">
+          <a href="#settings" class="treasurer-menu-item" data-page="settings">
+            <i class="fas fa-cog"></i>
+            <span class="treasurer-menu-text">Financial Settings</span>
+          </a>
+          
+          <a href="#" class="treasurer-menu-item" id="treasurerLogoutBtn">
+            <i class="fas fa-sign-out-alt"></i>
+            <span class="treasurer-menu-text">Logout</span>
+          </a>
+        </div>
+      </nav>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="treasurer-main-content">
+      <!-- Header -->
+      <header class="treasurer-header">
+        <div class="treasurer-header-left">
+          <button class="treasurer-mobile-menu-btn" id="treasurerMobileMenuBtn">
+            <i class="fas fa-bars"></i>
+          </button>
+          <h1><i class="fas fa-coins"></i> <span id="treasurerPageTitle">Financial Dashboard</span></h1>
+          <p id="treasurerPageSubtitle">Manage all financial operations of the chama</p>
+        </div>
+        
+        <div class="treasurer-header-right">
+          <div class="financial-quick-stats hide-on-mobile">
+            <div class="quick-stat-item">
+              <i class="fas fa-wallet text-success"></i>
+              <div>
+                <div class="quick-stat-label">Balance</div>
+                <div class="quick-stat-value">Ksh <span id="quickBalance">0</span></div>
+              </div>
+            </div>
+            <div class="quick-stat-item">
+              <i class="fas fa-exclamation-triangle text-warning"></i>
+              <div>
+                <div class="quick-stat-label">Overdue</div>
+                <div class="quick-stat-value"><span id="quickOverdue">0</span></div>
+              </div>
+            </div>
+            <div class="quick-stat-item">
+              <i class="fas fa-calendar-check text-info"></i>
+              <div>
+                <div class="quick-stat-label">This Month</div>
+                <div class="quick-stat-value">Ksh <span id="quickMonthTotal">0</span></div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="dropdown">
+            <button class="btn btn-success dropdown-toggle" type="button" id="financialActionsDropdown" data-bs-toggle="dropdown">
+              <i class="fas fa-bolt me-2"></i>Quick Finance
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="#" id="batchCollectionBtn"><i class="fas fa-money-bill-wave me-2"></i>Batch Collection</a></li>
+              <li><a class="dropdown-item" href="#" id="disburseLoanBtn"><i class="fas fa-hand-holding-usd me-2"></i>Disburse Loan</a></li>
+              <li><a class="dropdown-item" href="#" id="calculateInterestBtn"><i class="fas fa-calculator me-2"></i>Calculate Interest</a></li>
+              <li><a class="dropdown-item" href="#" id="generateReportBtn"><i class="fas fa-file-pdf me-2"></i>Generate Report</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#audit"><i class="fas fa-search-dollar me-2"></i>View Audit</a></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      
+      <!-- Content Area -->
+      <div class="treasurer-content">
+        
+        <!-- Financial Dashboard Page -->
+        <div id="dashboardPage" class="page-content">
+          <!-- Financial Alerts -->
+          <div class="financial-alert alert-warning">
+            <i class="fas fa-exclamation-triangle fa-2x"></i>
+            <div>
+              <strong>5 contributions overdue</strong>
+              <p class="mb-0">Total overdue amount: Ksh <span id="overdueAmount">25,000</span></p>
+            </div>
+            <button class="btn btn-warning ms-auto" id="viewOverdueBtn">View Details</button>
+          </div>
+          
+          <!-- Financial Overview Cards -->
+          <div class="financial-overview">
+            <div class="financial-card">
+              <div class="financial-card-icon">
+                <i class="fas fa-piggy-bank"></i>
+              </div>
+              <h4 class="financial-card-title">Total Chama Balance</h4>
+              <div class="financial-card-value currency" id="totalBalance">0</div>
+              <div class="financial-card-trend trend-up">
+                <i class="fas fa-arrow-up"></i>
+                <span>12% from last month</span>
+              </div>
+              <p class="financial-card-subtext">Available for loans and investments</p>
+            </div>
+            
+            <div class="financial-card">
+              <div class="financial-card-icon" style="background: linear-gradient(135deg, #0d6efd, #0dcaf0);">
+                <i class="fas fa-hand-holding-usd"></i>
+              </div>
+              <h4 class="financial-card-title">Monthly Contributions</h4>
+              <div class="financial-card-value currency" id="monthlyContributions">0</div>
+              <div class="financial-card-trend trend-up">
+                <i class="fas fa-arrow-up"></i>
+                <span>8% collection rate</span>
+              </div>
+              <p class="financial-card-subtext"><span id="collectedCount">0</span> of <span id="totalMembersCount">0</span> members paid</p>
+            </div>
+            
+            <div class="financial-card">
+              <div class="financial-card-icon" style="background: linear-gradient(135deg, #6f42c1, #a370f7);">
+                <i class="fas fa-landmark"></i>
+              </div>
+              <h4 class="financial-card-title">Active Loans</h4>
+              <div class="financial-card-value currency" id="activeLoansTotal">0</div>
+              <div class="financial-card-trend trend-down">
+                <i class="fas fa-arrow-down"></i>
+                <span>5% from last month</span>
+              </div>
+              <p class="financial-card-subtext"><span id="activeLoansCount">0</span> loans disbursed</p>
+            </div>
+            
+            <div class="financial-card">
+              <div class="financial-card-icon" style="background: linear-gradient(135deg, #fd7e14, #ffc107);">
+                <i class="fas fa-chart-line"></i>
+              </div>
+              <h4 class="financial-card-title">Interest Earned</h4>
+              <div class="financial-card-value currency" id="interestEarned">0</div>
+              <div class="financial-card-trend trend-up">
+                <i class="fas fa-arrow-up"></i>
+                <span>15% this month</span>
+              </div>
+              <p class="financial-card-subtext">From loan repayments</p>
+            </div>
+          </div>
+          
+          <!-- Charts Row -->
+          <div class="row mt-4">
+            <div class="col-lg-8">
+              <div class="financial-chart-container">
+                <div class="financial-chart-header">
+                  <h3 class="financial-chart-title"><i class="fas fa-chart-bar me-2"></i>Financial Performance</h3>
+                  <div class="chart-controls">
+                    <select class="form-select form-select-sm" id="chartPeriod">
+                      <option value="monthly">Monthly</option>
+                      <option value="quarterly">Quarterly</option>
+                      <option value="yearly">Yearly</option>
+                    </select>
+                  </div>
+                </div>
+                <canvas id="financialPerformanceChart"></canvas>
+              </div>
+            </div>
+            
+            <div class="col-lg-4">
+              <div class="financial-chart-container">
+                <div class="financial-chart-header">
+                  <h3 class="financial-chart-title"><i class="fas fa-chart-pie me-2"></i>Revenue Sources</h3>
+                </div>
+                <canvas id="revenueSourcesChart"></canvas>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Recent Transactions -->
+          <div class="financial-table-container mt-4">
+            <div class="financial-table-header">
+              <h3><i class="fas fa-history me-2"></i>Recent Transactions</h3>
+              <div class="financial-table-actions">
+                <button class="btn btn-sm btn-outline-success" id="exportTransactionsBtn">
+                  <i class="fas fa-download me-1"></i> Export
+                </button>
+                <button class="btn btn-sm btn-primary" id="recordTransactionBtn">
+                  <i class="fas fa-plus me-1"></i> Record Transaction
+                </button>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="table financial-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Member</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Balance</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="recentTransactionsTable">
+                  <!-- Filled by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Manage Contributions Page -->
+        <div id="contributionsPage" class="page-content d-none">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h2><i class="fas fa-hand-holding-usd me-2"></i>Manage Contributions</h2>
+              <p class="text-muted mb-0">Track, collect, and manage member contributions</p>
+            </div>
+            <div class="export-buttons">
+              <button class="btn-export" id="exportContributionsExcel">
+                <i class="fas fa-file-excel"></i> Excel
+              </button>
+              <button class="btn-export" id="exportContributionsPDF">
+                <i class="fas fa-file-pdf"></i> PDF
+              </button>
+              <button class="btn btn-success" id="bulkCollectionBtn">
+                <i class="fas fa-money-bill-wave me-2"></i> Bulk Collection
+              </button>
+            </div>
+          </div>
+          
+          <!-- Contribution Filters -->
+          <div class="financial-filters">
+            <div class="filter-group">
+              <label class="filter-label">Month</label>
+              <select class="form-select" id="contributionMonthFilter">
+                <option value="">All Months</option>
+                <!-- Filled by JS -->
+              </select>
+            </div>
+            <div class="filter-group">
+              <label class="filter-label">Year</label>
+              <select class="form-select" id="contributionYearFilter">
+                <option value="">All Years</option>
+                <!-- Filled by JS -->
+              </select>
+            </div>
+            <div class="filter-group">
+              <label class="filter-label">Status</label>
+              <select class="form-select" id="contributionStatusFilter">
+                <option value="">All Status</option>
+                <option value="paid">Paid</option>
+                <option value="pending">Pending</option>
+                <option value="overdue">Overdue</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label class="filter-label">Member</label>
+              <select class="form-select" id="contributionMemberFilter">
+                <option value="">All Members</option>
+                <!-- Filled by JS -->
+              </select>
+            </div>
+            <div class="filter-group align-self-end">
+              <button class="btn btn-primary" id="applyFiltersBtn">Apply Filters</button>
+            </div>
+          </div>
+          
+          <!-- Contribution Summary -->
+          <div class="financial-summary-cards">
+            <div class="summary-card">
+              <div class="summary-card-title">Total Expected</div>
+              <div class="summary-card-value currency" id="expectedTotal">0</div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-card-title">Total Collected</div>
+              <div class="summary-card-value currency" id="collectedTotal">0</div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-card-title">Pending</div>
+              <div class="summary-card-value currency" id="pendingTotal">0</div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-card-title">Collection Rate</div>
+              <div class="summary-card-value" id="collectionRate">0%</div>
+            </div>
+          </div>
+          
+          <!-- Contributions Table -->
+          <div class="financial-table-container">
+            <div class="financial-table-header">
+              <h3>Member Contributions</h3>
+              <div class="financial-table-actions">
+                <button class="btn btn-sm btn-outline-secondary" id="sendRemindersBtn">
+                  <i class="fas fa-bell me-1"></i> Send Reminders
+                </button>
+                <button class="btn btn-sm btn-success" id="recordBulkPaymentBtn">
+                  <i class="fas fa-check-circle me-1"></i> Record Bulk Payment
+                </button>
+              </div>
+            </div>
+            <div class="scrollable-table">
+              <table class="table financial-table">
+                <thead>
+                  <tr>
+                    <th>Member</th>
+                    <th>Membership No.</th>
+                    <th>Month</th>
+                    <th>Expected</th>
+                    <th>Paid</th>
+                    <th>Balance</th>
+                    <th>Status</th>
+                    <th>Last Paid</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="contributionsManagementTable">
+                  <!-- Filled by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+          <!-- Monthly Collection Chart -->
+          <div class="financial-chart-container mt-4">
+            <div class="financial-chart-header">
+              <h3 class="financial-chart-title"><i class="fas fa-chart-line me-2"></i>Monthly Collection Trend</h3>
+            </div>
+            <canvas id="collectionTrendChart"></canvas>
+          </div>
+        </div>
+        
+        <!-- Loan Disbursement Page -->
+        <div id="loansPage" class="page-content d-none">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h2><i class="fas fa-landmark me-2"></i>Loan Disbursement</h2>
+              <p class="text-muted mb-0">Manage loan applications and disbursements</p>
+            </div>
+            <button class="btn btn-primary" id="newDisbursementBtn">
+              <i class="fas fa-hand-holding-usd me-2"></i>New Disbursement
+            </button>
+          </div>
+          
+          <!-- Loan Disbursement Tabs -->
+          <ul class="nav nav-tabs mb-4" id="loanDisbursementTabs">
+            <li class="nav-item">
+              <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#pendingLoansTab">Pending Approval (<span id="pendingLoansTabCount">0</span>)</button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#approvedLoansTab">Approved Loans</button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#disbursedLoansTab">Disbursed Loans</button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#defaultedLoansTab">Defaulted Loans</button>
+            </li>
+          </ul>
+          
+          <div class="tab-content" id="loanDisbursementContent">
+            <!-- Pending Loans Tab -->
+            <div class="tab-pane fade show active" id="pendingLoansTab">
+              <div id="pendingLoansList">
+                <!-- Filled by JavaScript -->
+              </div>
+            </div>
+            
+            <!-- Approved Loans Tab -->
+            <div class="tab-pane fade" id="approvedLoansTab">
+              <div id="approvedLoansList">
+                <!-- Filled by JavaScript -->
+              </div>
+            </div>
+            
+            <!-- Disbursed Loans Tab -->
+            <div class="tab-pane fade" id="disbursedLoansTab">
+              <div id="disbursedLoansList">
+                <!-- Filled by JavaScript -->
+              </div>
+            </div>
+            
+            <!-- Defaulted Loans Tab -->
+            <div class="tab-pane fade" id="defaultedLoansTab">
+              <div id="defaultedLoansList">
+                <!-- Filled by JavaScript -->
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Repayments Page -->
+        <div id="repaymentsPage" class="page-content d-none">
+          <div class="mb-4">
+            <h2><i class="fas fa-money-check-alt me-2"></i>Repayments Management</h2>
+            <p class="text-muted">Track and manage loan repayments</p>
+          </div>
+          
+          <!-- Repayment Summary -->
+          <div class="financial-summary-cards">
+            <div class="summary-card">
+              <div class="summary-card-title">Total Due</div>
+              <div class="summary-card-value currency" id="totalDue">0</div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-card-title">Total Collected</div>
+              <div class="summary-card-value currency" id="repaymentsCollected">0</div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-card-title">Overdue</div>
+              <div class="summary-card-value currency" id="overdueRepaymentsTotal">0</div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-card-title">Collection Rate</div>
+              <div class="summary-card-value" id="repaymentRate">0%</div>
+            </div>
+          </div>
+          
+          <!-- Overdue Repayments -->
+          <div class="financial-table-container mt-4">
+            <div class="financial-table-header">
+              <h3><i class="fas fa-exclamation-triangle me-2 text-warning"></i>Overdue Repayments</h3>
+              <button class="btn btn-sm btn-warning" id="sendOverdueRemindersBtn">
+                <i class="fas fa-bell me-1"></i> Send Notifications
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="table financial-table">
+                <thead>
+                  <tr>
+                    <th>Member</th>
+                    <th>Loan ID</th>
+                    <th>Due Date</th>
+                    <th>Amount Due</th>
+                    <th>Days Overdue</th>
+                    <th>Penalty</th>
+                    <th>Total Due</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="overdueRepaymentsTable">
+                  <!-- Filled by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+          <!-- Recent Repayments -->
+          <div class="financial-table-container mt-4">
+            <div class="financial-table-header">
+              <h3><i class="fas fa-history me-2"></i>Recent Repayments</h3>
+              <button class="btn btn-sm btn-success" id="recordRepaymentBtn">
+                <i class="fas fa-plus me-1"></i> Record Repayment
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="table financial-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Member</th>
+                    <th>Loan ID</th>
+                    <th>Amount</th>
+                    <th>Payment Method</th>
+                    <th>Reference</th>
+                    <th>Received By</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="recentRepaymentsTable">
+                  <!-- Filled by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Interest Calculation Page -->
+        <div id="interestPage" class="page-content d-none">
+          <div class="mb-4">
+            <h2><i class="fas fa-percentage me-2"></i>Interest Calculation</h2>
+            <p class="text-muted">Calculate and apply interest on loans</p>
+          </div>
+          
+          <!-- Interest Calculator -->
+          <div class="interest-calculator">
+            <div class="calculator-header">
+              <h4><i class="fas fa-calculator me-2"></i>Interest Calculator</h4>
+              <p class="text-muted">Calculate interest for a specific loan or all loans</p>
+            </div>
+            
+            <div class="calculator-form">
+              <div class="form-group">
+                <label class="form-label">Loan ID</label>
+                <select class="form-select" id="interestLoanSelect">
+                  <option value="">Select Loan</option>
+                  <!-- Filled by JS -->
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Principal Amount</label>
+                <input type="number" class="form-control" id="interestPrincipal" placeholder="Enter amount">
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Interest Rate (%)</label>
+                <input type="number" class="form-control" id="interestRate" step="0.01" value="10">
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Period (Months)</label>
+                <input type="number" class="form-control" id="interestPeriod" value="12">
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Interest Type</label>
+                <select class="form-select" id="interestType">
+                  <option value="simple">Simple Interest</option>
+                  <option value="compound">Compound Interest</option>
+                </select>
+              </div>
+            </div>
+            
+            <button class="btn btn-primary" id="calculateInterestBtn">
+              <i class="fas fa-calculator me-2"></i> Calculate Interest
+            </button>
+            
+            <div class="calculator-result" id="interestResult" style="display: none;">
+              <h5>Calculation Results</h5>
+              <div class="result-item">
+                <span class="result-label">Principal Amount:</span>
+                <span class="result-value currency" id="resultPrincipal">0</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">Interest Amount:</span>
+                <span class="result-value currency" id="resultInterest">0</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">Total Payable:</span>
+                <span class="result-value currency" id="resultTotal">0</span>
+              </div>
+              <div class="result-item">
+                <span class="result-label">Monthly Payment:</span>
+                <span class="result-value currency" id="resultMonthly">0</span>
+              </div>
+              <button class="btn btn-success mt-3" id="applyInterestBtn">
+                <i class="fas fa-check-circle me-2"></i> Apply to Loan
+              </button>
+            </div>
+          </div>
+          
+          <!-- Bulk Interest Calculation -->
+          <div class="financial-table-container mt-4">
+            <div class="financial-table-header">
+              <h3><i class="fas fa-cogs me-2"></i>Bulk Interest Calculation</h3>
+              <button class="btn btn-sm btn-warning" id="calculateAllInterestBtn">
+                <i class="fas fa-calculator me-1"></i> Calculate All
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="table financial-table">
+                <thead>
+                  <tr>
+                    <th>Loan ID</th>
+                    <th>Member</th>
+                    <th>Principal</th>
+                    <th>Interest Rate</th>
+                    <th>Interest Due</th>
+                    <th>Total Payable</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="bulkInterestTable">
+                  <!-- Filled by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Share-out Calculations Page -->
+        <div id="shareoutsPage" class="page-content d-none">
+          <div class="mb-4">
+            <h2><i class="fas fa-share-alt me-2"></i>Share-out Calculations</h2>
+            <p class="text-muted">Calculate and distribute share-outs to members</p>
+          </div>
+          
+          <!-- Share-out Calculator -->
+          <div class="shareout-calculator">
+            <h4><i class="fas fa-calculator me-2"></i>Share-out Calculator</h4>
+            
+            <div class="row mt-3">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-label">Total Available for Share-out</label>
+                  <input type="number" class="form-control" id="shareoutTotal" placeholder="Enter total amount">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-label">Distribution Method</label>
+                  <select class="form-select" id="shareoutMethod">
+                    <option value="equal">Equal Share</option>
+                    <option value="proportional">Proportional to Contributions</option>
+                    <option value="custom">Custom Allocation</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <button class="btn btn-primary mt-3" id="calculateShareoutBtn">
+              <i class="fas fa-calculator me-2"></i> Calculate Share-out
+            </button>
+            
+            <div class="shareout-summary" id="shareoutSummary" style="display: none;">
+              <h5 class="mt-4">Distribution Summary</h5>
+              <div id="shareoutDistribution">
+                <!-- Filled by JavaScript -->
+              </div>
+              <button class="btn btn-success mt-3" id="recordShareoutBtn">
+                <i class="fas fa-check-circle me-2"></i> Record Share-out
+              </button>
+            </div>
+          </div>
+          
+          <!-- Share-out History -->
+          <div class="financial-table-container mt-4">
+            <div class="financial-table-header">
+              <h3><i class="fas fa-history me-2"></i>Share-out History</h3>
+              <button class="btn btn-sm btn-outline-primary" id="newShareoutBtn">
+                <i class="fas fa-plus me-1"></i> New Share-out
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="table financial-table">
+                <thead>
+                  <tr>
+                    <th>Year</th>
+                    <th>Total Amount</th>
+                    <th>Members</th>
+                    <th>Average Share</th>
+                    <th>Calculated By</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="shareoutHistoryTable">
+                  <!-- Filled by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Financial Reports Page -->
+        <div id="reportsPage" class="page-content d-none">
+          <div class="mb-4">
+            <h2><i class="fas fa-chart-bar me-2"></i>Financial Reports</h2>
+            <p class="text-muted">Generate and view financial reports</p>
+          </div>
+          
+          <!-- Report Generator -->
+          <div class="report-generator">
+            <h4><i class="fas fa-file-alt me-2"></i>Report Generator</h4>
+            
+            <div class="report-options">
+              <div class="report-option-card" data-report="balance-sheet">
+                <i class="fas fa-balance-scale fa-3x text-primary mb-3"></i>
+                <h5>Balance Sheet</h5>
+                <p class="text-muted small">Assets, liabilities, and equity</p>
+              </div>
+              
+              <div class="report-option-card" data-report="income-statement">
+                <i class="fas fa-chart-line fa-3x text-success mb-3"></i>
+                <h5>Income Statement</h5>
+                <p class="text-muted small">Revenue and expenses</p>
+              </div>
+              
+              <div class="report-option-card" data-report="cash-flow">
+                <i class="fas fa-money-bill-wave fa-3x text-info mb-3"></i>
+                <h5>Cash Flow Statement</h5>
+                <p class="text-muted small">Cash inflows and outflows</p>
+              </div>
+              
+              <div class="report-option-card" data-report="contributions-report">
+                <i class="fas fa-hand-holding-usd fa-3x text-warning mb-3"></i>
+                <h5>Contributions Report</h5>
+                <p class="text-muted small">Member contributions analysis</p>
+              </div>
+              
+              <div class="report-option-card" data-report="loans-report">
+                <i class="fas fa-landmark fa-3x text-danger mb-3"></i>
+                <h5>Loans Report</h5>
+                <p class="text-muted small">Loan portfolio analysis</p>
+              </div>
+              
+              <div class="report-option-card" data-report="audit-report">
+                <i class="fas fa-clipboard-check fa-3x text-secondary mb-3"></i>
+                <h5>Audit Report</h5>
+                <p class="text-muted small">Financial audit trail</p>
+              </div>
+            </div>
+            
+            <div class="row mt-4" id="reportParameters" style="display: none;">
+              <div class="col-md-4">
+                <label class="form-label">Report Period</label>
+                <select class="form-select" id="reportPeriod">
+                  <option value="monthly">Monthly</option>
+                  <option value="quarterly">Quarterly</option>
+                  <option value="yearly">Yearly</option>
+                  <option value="custom">Custom Range</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Start Date</label>
+                <input type="date" class="form-control" id="reportStartDate">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">End Date</label>
+                <input type="date" class="form-control" id="reportEndDate">
+              </div>
+              <div class="col-md-12 mt-3">
+                <button class="btn btn-success" id="generateReportBtn">
+                  <i class="fas fa-file-pdf me-2"></i> Generate Report
+                </button>
+                <button class="btn btn-outline-secondary ms-2" id="previewReportBtn">
+                  <i class="fas fa-eye me-2"></i> Preview
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Generated Reports -->
+          <div class="financial-table-container mt-4">
+            <div class="financial-table-header">
+              <h3><i class="fas fa-history me-2"></i>Recently Generated Reports</h3>
+            </div>
+            <div class="table-responsive">
+              <table class="table financial-table">
+                <thead>
+                  <tr>
+                    <th>Report Name</th>
+                    <th>Period</th>
+                    <th>Generated By</th>
+                    <th>Date Generated</th>
+                    <th>Size</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="generatedReportsTable">
+                  <!-- Filled by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Bank Statements Page -->
+        <div id="statementsPage" class="page-content d-none">
+          <div class="mb-4">
+            <h2><i class="fas fa-file-invoice-dollar me-2"></i>Bank Statements</h2>
+            <p class="text-muted">Upload and reconcile bank statements</p>
+          </div>
+          
+          <!-- Statement Upload -->
+          <div class="financial-card mb-4">
+            <h4><i class="fas fa-upload me-2"></i>Upload Bank Statement</h4>
+            <div class="mt-3">
+              <input type="file" class="form-control" id="bankStatementFile" accept=".pdf,.csv,.xlsx">
+              <div class="mt-2">
+                <button class="btn btn-primary" id="uploadStatementBtn">
+                  <i class="fas fa-upload me-2"></i> Upload
+                </button>
+                <button class="btn btn-outline-secondary ms-2" id="reconcileBtn">
+                  <i class="fas fa-sync-alt me-2"></i> Reconcile
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Statement History -->
+          <div class="financial-table-container">
+            <div class="financial-table-header">
+              <h3><i class="fas fa-history me-2"></i>Statement History</h3>
+            </div>
+            <div class="table-responsive">
+              <table class="table financial-table">
+                <thead>
+                  <tr>
+                    <th>Statement Date</th>
+                    <th>Bank</th>
+                    <th>Account</th>
+                    <th>Opening Balance</th>
+                    <th>Closing Balance</th>
+                    <th>Status</th>
+                    <th>Uploaded By</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="bankStatementsTable">
+                  <!-- Filled by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Audit Trail Page -->
+        <div id="auditPage" class="page-content d-none">
+          <div class="mb-4">
+            <h2><i class="fas fa-clipboard-check me-2"></i>Audit Trail</h2>
+            <p class="text-muted">Track all financial transactions and changes</p>
+          </div>
+          
+          <!-- Audit Filters -->
+          <div class="financial-filters">
+            <div class="filter-group">
+              <label class="filter-label">Action Type</label>
+              <select class="form-select" id="auditActionFilter">
+                <option value="">All Actions</option>
+                <option value="contribution">Contribution</option>
+                <option value="loan">Loan</option>
+                <option value="repayment">Repayment</option>
+                <option value="shareout">Share-out</option>
+                <option value="adjustment">Adjustment</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label class="filter-label">User</label>
+              <select class="form-select" id="auditUserFilter">
+                <option value="">All Users</option>
+                <!-- Filled by JS -->
+              </select>
+            </div>
+            <div class="filter-group">
+              <label class="filter-label">Date Range</label>
+              <input type="date" class="form-control" id="auditStartDate">
+            </div>
+            <div class="filter-group">
+              <label class="filter-label">To</label>
+              <input type="date" class="form-control" id="auditEndDate">
+            </div>
+            <div class="filter-group align-self-end">
+              <button class="btn btn-primary" id="applyAuditFiltersBtn">Filter</button>
+            </div>
+          </div>
+          
+          <!-- Audit Log -->
+          <div class="financial-table-container">
+            <div class="financial-table-header">
+              <h3><i class="fas fa-history me-2"></i>Audit Log</h3>
+              <button class="btn btn-sm btn-outline-secondary" id="exportAuditLogBtn">
+                <i class="fas fa-download me-1"></i> Export
+              </button>
+            </div>
+            <div class="scrollable-table">
+              <table class="table financial-table">
+                <thead>
+                  <tr>
+                    <th>Timestamp</th>
+                    <th>User</th>
+                    <th>Action</th>
+                    <th>Table</th>
+                    <th>Record ID</th>
+                    <th>Changes</th>
+                    <th>IP Address</th>
+                  </tr>
+                </thead>
+                <tbody id="auditLogTable">
+                  <!-- Filled by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Financial Settings Page -->
+        <div id="settingsPage" class="page-content d-none">
+          <div class="mb-4">
+            <h2><i class="fas fa-cog me-2"></i>Financial Settings</h2>
+            <p class="text-muted">Configure financial parameters and preferences</p>
+          </div>
+          
+          <!-- Settings Tabs -->
+          <ul class="nav nav-tabs mb-4" id="settingsTabs">
+            <li class="nav-item">
+              <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#contributionSettingsTab">Contributions</button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#loanSettingsTab">Loans</button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#interestSettingsTab">Interest</button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#penaltySettingsTab">Penalties</button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#notificationSettingsTab">Notifications</button>
+            </li>
+          </ul>
+          
+          <div class="tab-content" id="settingsContent">
+            <!-- Contribution Settings -->
+            <div class="tab-pane fade show active" id="contributionSettingsTab">
+              <div class="financial-card">
+                <h4>Contribution Settings</h4>
+                <form id="contributionSettingsForm">
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Default Contribution Amount</label>
+                      <input type="number" class="form-control" id="defaultContributionAmount" value="5000">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Contribution Due Day</label>
+                      <input type="number" class="form-control" id="contributionDueDay" min="1" max="31" value="25">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Late Payment Grace Period (Days)</label>
+                      <input type="number" class="form-control" id="gracePeriod" value="7">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Allowed Payment Methods</label>
+                      <select class="form-select" id="paymentMethods" multiple>
+                        <option value="mpesa" selected>M-Pesa</option>
+                        <option value="bank" selected>Bank Transfer</option>
+                        <option value="cash" selected>Cash</option>
+                        <option value="cheque">Cheque</option>
+                      </select>
+                    </div>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Save Settings</button>
+                </form>
+              </div>
+            </div>
+            
+            <!-- Loan Settings -->
+            <div class="tab-pane fade" id="loanSettingsTab">
+              <div class="financial-card">
+                <h4>Loan Settings</h4>
+                <form id="loanSettingsForm">
+                  <!-- Loan settings form -->
+                </form>
+              </div>
+            </div>
+            
+            <!-- Other settings tabs would be similar -->
+          </div>
+        </div>
+        
+      </div>
+    </main>
+  </div>
+  
+  <!-- Modals -->
+  
+  <!-- Record Transaction Modal -->
+  <div class="modal fade" id="recordTransactionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fas fa-plus-circle me-2"></i>Record Transaction</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="transactionForm">
+            <!-- Transaction form -->
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="saveTransactionBtn">Save Transaction</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Disburse Loan Modal -->
+  <div class="modal fade" id="disburseLoanModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fas fa-hand-holding-usd me-2"></i>Disburse Loan</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="disburseLoanForm">
+            <!-- Loan disbursement form -->
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="confirmDisbursementBtn">Disburse Loan</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Bulk Collection Modal -->
+  <div class="modal fade" id="bulkCollectionModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fas fa-money-bill-wave me-2"></i>Bulk Collection</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div id="bulkCollectionContent">
+            <!-- Bulk collection interface -->
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-success" id="saveBulkCollectionBtn">Save Collections</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Custom JavaScript -->
+  <script type="module">
+    // Import Supabase configuration
+    import supabase from "./supabase/supabase.js";
+    
+    // Global state
+    let currentTreasurer = null;
+    let treasurerProfile = null;
+    let currentPage = 'dashboard';
+    
+    // DOM Elements
+    const treasurerSidebar = document.getElementById('treasurerSidebar');
+    const treasurerSidebarToggle = document.getElementById('treasurerSidebarToggle');
+    const treasurerMobileMenuBtn = document.getElementById('treasurerMobileMenuBtn');
+    const treasurerMenuItems = document.querySelectorAll('.treasurer-menu-item');
+    const pageContents = document.querySelectorAll('.page-content');
+    const treasurerPageTitle = document.getElementById('treasurerPageTitle');
+    const treasurerPageSubtitle = document.getElementById('treasurerPageSubtitle');
+    
+    // Initialize Treasurer Dashboard
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        // Check authentication
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        if (authError || !user) {
+          window.location.href = 'login.html';
+          return;
+        }
+        
+        // Load treasurer data
+        await loadTreasurerData(user);
+        
+        // Load initial page data
+        await switchPage('dashboard');
+        
+        // Setup event listeners
+        setupTreasurerEventListeners();
+        
+        // Initialize financial dashboard
+        initializeFinancialDashboard();
+        
+      } catch (error) {
+        console.error('Treasurer dashboard initialization error:', error);
+        showTreasurerError('Error loading dashboard. Please try again.');
+      }
+    });
+    
+    // Load Treasurer Data
+    async function loadTreasurerData(user) {
+      try {
+        // Get treasurer profile
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+        
+        if (profileError) throw profileError;
+        
+        if (!profile) {
+          await supabase.auth.signOut();
+          window.location.href = 'login.html';
+          return;
+        }
+        
+        // Check if user is a treasurer
+        if (profile.role !== 'treasurer') {
+          // Redirect to appropriate dashboard
+          window.location.href = `dashboards/${profile.role}/dashboard.html`;
+          return;
+        }
+        
+        treasurerProfile = profile;
+        currentTreasurer = profile;
+        
+        // Update UI with treasurer info
+        updateTreasurerUI();
+        
+      } catch (error) {
+        console.error('Error loading treasurer data:', error);
+        throw error;
+      }
+    }
+    
+    // Update Treasurer UI
+    function updateTreasurerUI() {
+      if (!currentTreasurer) return;
+      
+      // Update avatar with initial
+      const avatar = document.getElementById('treasurerAvatar');
+      if (avatar) {
+        avatar.innerHTML = currentTreasurer.full_name.charAt(0).toUpperCase();
+      }
+      
+      // Update name fields
+      document.getElementById('treasurerFullName').textContent = currentTreasurer.full_name;
+    }
+    
+    // Switch Page Function
+    async function switchPage(page) {
+      currentPage = page;
+      
+      // Hide all pages
+      pageContents.forEach(p => p.classList.add('d-none'));
+      
+      // Show selected page
+      const pageElement = document.getElementById(`${page}Page`);
+      if (!pageElement) {
+        console.error(`Page ${page} not found`);
+        return;
+      }
+      
+      pageElement.classList.remove('d-none');
+      
+      // Update page title and subtitle
+      updateTreasurerPageTitle(page);
+      
+      // Load page-specific data
+      await loadTreasurerPageData(page);
+      
+      // Update active menu item
+      updateActiveTreasurerMenuItem(page);
+    }
+    
+    // Update Treasurer Page Title
+    function updateTreasurerPageTitle(page) {
+      const pageTitles = {
+        dashboard: { title: 'Financial Dashboard', subtitle: 'Complete financial overview' },
+        contributions: { title: 'Manage Contributions', subtitle: 'Track and collect member contributions' },
+        loans: { title: 'Loan Disbursement', subtitle: 'Manage loan applications and disbursements' },
+        repayments: { title: 'Repayments Management', subtitle: 'Track and manage loan repayments' },
+        interest: { title: 'Interest Calculation', subtitle: 'Calculate and apply interest on loans' },
+        shareouts: { title: 'Share-out Calculations', subtitle: 'Calculate and distribute share-outs' },
+        reports: { title: 'Financial Reports', subtitle: 'Generate and view financial reports' },
+        statements: { title: 'Bank Statements', subtitle: 'Upload and reconcile bank statements' },
+        audit: { title: 'Audit Trail', subtitle: 'Track all financial transactions and changes' },
+        settings: { title: 'Financial Settings', subtitle: 'Configure financial parameters' }
+      };
+      
+      const pageInfo = pageTitles[page] || { 
+        title: page.charAt(0).toUpperCase() + page.slice(1), 
+        subtitle: '' 
+      };
+      
+      treasurerPageTitle.textContent = pageInfo.title;
+      treasurerPageSubtitle.textContent = pageInfo.subtitle;
+    }
+    
+    // Update Active Menu Item
+    function updateActiveTreasurerMenuItem(page) {
+      treasurerMenuItems.forEach(item => {
+        item.classList.remove('active');
+        if (item.getAttribute('data-page') === page) {
+          item.classList.add('active');
+        }
+      });
+    }
+    
+    // Load Treasurer Page Data
+    async function loadTreasurerPageData(page) {
+      try {
+        switch(page) {
+          case 'dashboard':
+            await loadFinancialDashboardData();
+            break;
+          case 'contributions':
+            await loadContributionsManagementData();
+            break;
+          case 'loans':
+            await loadLoanDisbursementData();
+            break;
+          case 'repayments':
+            await loadRepaymentsManagementData();
+            break;
+          case 'interest':
+            await loadInterestCalculationData();
+            break;
+          case 'shareouts':
+            await loadShareoutCalculationData();
+            break;
+          case 'reports':
+            await loadFinancialReportsData();
+            break;
+          case 'statements':
+            await loadBankStatementsData();
+            break;
+          case 'audit':
+            await loadAuditTrailData();
+            break;
+          case 'settings':
+            await loadFinancialSettingsData();
+            break;
+          default:
+            console.log(`No data loader for ${page}`);
+        }
+      } catch (error) {
+        console.error(`Error loading ${page} data:`, error);
+        showTreasurerError(`Failed to load ${page} data`);
+      }
+    }
+    
+    // Load Financial Dashboard Data
+    async function loadFinancialDashboardData() {
+      try {
+        // Load total chama balance (sum of all contributions - sum of all loans + interest)
+        const { data: contributions, error: contributionsError } = await supabase
+          .from('contributions')
+          .select('amount');
+        
+        if (!contributionsError && contributions) {
+          const totalContributions = contributions.reduce((sum, c) => sum + parseFloat(c.amount || 0), 0);
+          
+          // Load total active loans
+          const { data: loans, error: loansError } = await supabase
+            .from('loans')
+            .select('principal_amount, status')
+            .eq('status', 'approved');
+          
+          let totalLoans = 0;
+          if (!loansError && loans) {
+            totalLoans = loans.reduce((sum, loan) => sum + parseFloat(loan.principal_amount || 0), 0);
+            document.getElementById('activeLoansCount').textContent = loans.length;
+            document.getElementById('activeLoansTotal').textContent = totalLoans.toLocaleString();
+          }
+          
+          // Calculate chama balance
+          const chamaBalance = totalContributions - totalLoans;
+          document.getElementById('totalBalance').textContent = chamaBalance.toLocaleString();
+          document.getElementById('quickBalance').textContent = chamaBalance.toLocaleString();
+        }
+        
+        // Load monthly contributions
+        const currentMonth = new Date().getMonth() + 1;
+        const currentYear = new Date().getFullYear();
+        
+        const { data: monthlyContributions, error: monthlyError } = await supabase
+          .from('contributions')
+          .select('amount')
+          .eq('contribution_month', currentMonth)
+          .eq('contribution_year', currentYear);
+        
+        if (!monthlyError && monthlyContributions) {
+          const monthlyTotal = monthlyContributions.reduce((sum, c) => sum + parseFloat(c.amount || 0), 0);
+          document.getElementById('monthlyContributions').textContent = monthlyTotal.toLocaleString();
+          document.getElementById('quickMonthTotal').textContent = monthlyTotal.toLocaleString();
+        }
+        
+        // Load total members
+        const { count: totalMembers, error: membersError } = await supabase
+          .from('profiles')
+          .select('*', { count: 'exact', head: true })
+          .eq('is_active', true);
+        
+        if (!membersError) {
+          document.getElementById('totalMembersCount').textContent = totalMembers || 0;
+        }
+        
+        // Load collected count for current month
+        const { count: collectedCount, error: collectedError } = await supabase
+          .from('contributions')
+          .select('member_id', { count: 'exact', head: true })
+          .eq('contribution_month', currentMonth)
+          .eq('contribution_year', currentYear);
+        
+        if (!collectedError) {
+          document.getElementById('collectedCount').textContent = collectedCount || 0;
+        }
+        
+        // Load pending contributions count
+        const { data: pendingContributions, error: pendingError } = await supabase
+          .from('contributions')
+          .select('member_id')
+          .eq('contribution_month', currentMonth)
+          .eq('contribution_year', currentYear);
+        
+        if (!pendingError && pendingContributions && totalMembers) {
+          const pendingCount = totalMembers - (new Set(pendingContributions.map(p => p.member_id))).size;
+          document.getElementById('pendingContributionsCount').textContent = pendingCount;
+        }
+        
+        // Load overdue repayments
+        const today = new Date().toISOString().split('T')[0];
+        const { data: overdueRepayments, error: overdueError } = await supabase
+          .from('repayment_schedules')
+          .select('id')
+          .lt('due_date', today)
+          .eq('is_paid', false);
+        
+        if (!overdueError) {
+          document.getElementById('overdueRepayments').textContent = overdueRepayments?.length || 0;
+          document.getElementById('quickOverdue').textContent = overdueRepayments?.length || 0;
+        }
+        
+        // Load recent transactions
+        await loadRecentTransactions();
+        
+        // Initialize charts
+        initializeFinancialCharts();
+        
+      } catch (error) {
+        console.error('Error loading financial dashboard data:', error);
+        throw error;
+      }
+    }
+    
+    // Load Contributions Management Data
+    async function loadContributionsManagementData() {
+      try {
+        const currentMonth = new Date().getMonth() + 1;
+        const currentYear = new Date().getFullYear();
+        
+        // Load all members
+        const { data: members, error: membersError } = await supabase
+          .from('profiles')
+          .select('id, full_name, members!inner(membership_no)')
+          .eq('is_active', true)
+          .order('full_name');
+        
+        if (membersError) throw membersError;
+        
+        // Load contributions for current month
+        const { data: contributions, error: contributionsError } = await supabase
+          .from('contributions')
+          .select('member_id, amount')
+          .eq('contribution_month', currentMonth)
+          .eq('contribution_year', currentYear);
+        
+        if (contributionsError) throw contributionsError;
+        
+        // Create contribution map for easy lookup
+        const contributionMap = new Map();
+        contributions?.forEach(contribution => {
+          contributionMap.set(contribution.member_id, parseFloat(contribution.amount));
+        });
+        
+        // Calculate totals
+        const defaultContribution = 5000; // Default monthly contribution
+        let totalExpected = 0;
+        let totalCollected = 0;
+        let totalPending = 0;
+        
+        // Build table rows
+        const tableBody = document.getElementById('contributionsManagementTable');
+        if (tableBody) {
+          tableBody.innerHTML = members.map(member => {
+            const memberId = member.id;
+            const memberName = member.full_name;
+            const membershipNo = member.members?.[0]?.membership_no || 'N/A';
+            const contributionAmount = contributionMap.get(memberId) || 0;
+            const expectedAmount = defaultContribution;
+            const balance = expectedAmount - contributionAmount;
+            const status = contributionAmount > 0 ? 'paid' : balance > 0 ? 'pending' : 'paid';
+            
+            // Update totals
+            totalExpected += expectedAmount;
+            totalCollected += contributionAmount;
+            if (balance > 0) totalPending += balance;
+            
+            return `
+              <tr>
+                <td>${memberName}</td>
+                <td>${membershipNo}</td>
+                <td>${getMonthName(currentMonth)} ${currentYear}</td>
+                <td class="amount-cell">${expectedAmount.toLocaleString()}</td>
+                <td class="amount-cell ${contributionAmount > 0 ? 'amount-positive' : ''}">${contributionAmount.toLocaleString()}</td>
+                <td class="amount-cell ${balance > 0 ? 'amount-negative' : ''}">${balance.toLocaleString()}</td>
+                <td>
+                  <span class="financial-status-badge ${status === 'paid' ? 'status-collected' : 'status-pending-collection'}">
+                    ${status === 'paid' ? 'Paid' : 'Pending'}
+                  </span>
+                </td>
+                <td>${contributionAmount > 0 ? 'Today' : '--'}</td>
+                <td>
+                  ${balance > 0 ? `
+                    <button class="treasurer-action-btn btn-collect" onclick="collectContribution('${memberId}', '${memberName}')">
+                      <i class="fas fa-money-bill-wave"></i> Collect
+                    </button>
+                  ` : `
+                    <button class="treasurer-action-btn btn-collect" disabled>
+                      <i class="fas fa-check"></i> Collected
+                    </button>
+                  `}
+                  <button class="treasurer-action-btn" onclick="viewContributionHistory('${memberId}')">
+                    <i class="fas fa-history"></i>
+                  </button>
+                </td>
+              </tr>
+            `;
+          }).join('');
+        }
+        
+        // Update summary cards
+        document.getElementById('expectedTotal').textContent = totalExpected.toLocaleString();
+        document.getElementById('collectedTotal').textContent = totalCollected.toLocaleString();
+        document.getElementById('pendingTotal').textContent = totalPending.toLocaleString();
+        
+        const collectionRate = totalExpected > 0 ? Math.round((totalCollected / totalExpected) * 100) : 0;
+        document.getElementById('collectionRate').textContent = `${collectionRate}%`;
+        
+        // Populate filters
+        populateContributionFilters(members);
+        
+        // Initialize collection trend chart
+        initializeCollectionTrendChart();
+        
+      } catch (error) {
+        console.error('Error loading contributions management data:', error);
+        showTreasurerError('Failed to load contributions data');
+      }
+    }
+    
+    // Load Loan Disbursement Data
+    async function loadLoanDisbursementData() {
+      try {
+        // Load pending loans (approved by chairperson but not disbursed)
+        const { data: pendingLoans, error: pendingError } = await supabase
+          .from('loans')
+          .select(`
+            *,
+            profiles!loans_member_id_fkey(full_name),
+            members!inner(membership_no)
+          `)
+          .eq('status', 'approved')
+          .is('disbursed_at', null)
+          .order('created_at', { ascending: false });
+        
+        if (pendingError) throw pendingError;
+        
+        // Update pending loans count
+        document.getElementById('pendingLoansCount').textContent = pendingLoans?.length || 0;
+        document.getElementById('pendingLoansTabCount').textContent = pendingLoans?.length || 0;
+        
+        // Populate pending loans list
+        const pendingLoansList = document.getElementById('pendingLoansList');
+        if (pendingLoansList) {
+          if (!pendingLoans || pendingLoans.length === 0) {
+            pendingLoansList.innerHTML = `
+              <div class="financial-empty-state">
+                <i class="fas fa-check-circle"></i>
+                <h4>No Pending Loans</h4>
+                <p>All approved loans have been disbursed.</p>
+              </div>
+            `;
+          } else {
+            pendingLoansList.innerHTML = pendingLoans.map(loan => `
+              <div class="loan-disbursement-card">
+                <div class="loan-disbursement-header">
+                  <h5 class="loan-disbursement-title">Loan Application #${loan.id.toString().padStart(4, '0')}</h5>
+                  <span class="financial-status-badge status-approved">Approved</span>
+                </div>
+                
+                <div class="loan-disbursement-details">
+                  <div class="disbursement-detail-item">
+                    <span class="disbursement-detail-label">Applicant</span>
+                    <span class="disbursement-detail-value">${loan.profiles?.full_name || 'Unknown'}</span>
+                  </div>
+                  <div class="disbursement-detail-item">
+                    <span class="disbursement-detail-label">Membership No.</span>
+                    <span class="disbursement-detail-value">${loan.members?.membership_no || 'N/A'}</span>
+                  </div>
+                  <div class="disbursement-detail-item">
+                    <span class="disbursement-detail-label">Principal Amount</span>
+                    <span class="disbursement-detail-value currency">${parseFloat(loan.principal_amount).toLocaleString()}</span>
+                  </div>
+                  <div class="disbursement-detail-item">
+                    <span class="disbursement-detail-label">Interest Rate</span>
+                    <span class="disbursement-detail-value">${loan.interest_rate}%</span>
+                  </div>
+                  <div class="disbursement-detail-item">
+                    <span class="disbursement-detail-label">Period</span>
+                    <span class="disbursement-detail-value">${loan.repayment_period_months} months</span>
+                  </div>
+                  <div class="disbursement-detail-item">
+                    <span class="disbursement-detail-label">Total Payable</span>
+                    <span class="disbursement-detail-value currency">${parseFloat(loan.total_payable || loan.principal_amount).toLocaleString()}</span>
+                  </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <small class="text-muted">
+                      Approved on: ${new Date(loan.created_at).toLocaleDateString()}
+                    </small>
+                  </div>
+                  <div>
+                    <button class="treasurer-action-btn btn-disburse" onclick="disburseLoan(${loan.id})">
+                      <i class="fas fa-hand-holding-usd me-1"></i> Disburse
+                    </button>
+                    <button class="treasurer-action-btn" onclick="viewLoanDetails(${loan.id})">
+                      <i class="fas fa-eye me-1"></i> View
+                    </button>
+                  </div>
+                </div>
+              </div>
+            `).join('');
+          }
+        }
+        
+        // Load disbursed loans
+        const { data: disbursedLoans, error: disbursedError } = await supabase
+          .from('loans')
+          .select(`
+            *,
+            profiles!loans_member_id_fkey(full_name)
+          `)
+          .not('disbursed_at', 'is', null)
+          .order('disbursed_at', { ascending: false });
+        
+        if (!disbursedError && disbursedLoans) {
+          const disbursedLoansList = document.getElementById('disbursedLoansList');
+          if (disbursedLoansList) {
+            disbursedLoansList.innerHTML = disbursedLoans.map(loan => `
+              <div class="financial-card mb-3">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <h5>Loan #${loan.id.toString().padStart(4, '0')} - ${loan.profiles?.full_name || 'Unknown'}</h5>
+                    <p class="text-muted mb-0">
+                      Disbursed: ${new Date(loan.disbursed_at).toLocaleDateString()} | 
+                      Amount: Ksh ${parseFloat(loan.principal_amount).toLocaleString()}
+                    </p>
+                  </div>
+                  <span class="financial-status-badge status-disbursed">Disbursed</span>
+                </div>
+              </div>
+            `).join('');
+          }
+        }
+        
+      } catch (error) {
+        console.error('Error loading loan disbursement data:', error);
+        showTreasurerError('Failed to load loan data');
+      }
+    }
+    
+    // Load Repayments Management Data
+    async function loadRepaymentsManagementData() {
+      try {
+        // Load overdue repayments
+        const today = new Date().toISOString().split('T')[0];
+        const { data: overdueSchedules, error: overdueError } = await supabase
+          .from('repayment_schedules')
+          .select(`
+            *,
+            loans!inner(
+              id,
+              principal_amount,
+              profiles!loans_member_id_fkey(full_name)
+            )
+          `)
+          .lt('due_date', today)
+          .eq('is_paid', false)
+          .order('due_date');
+        
+        if (overdueError) throw overdueError;
+        
+        // Update overdue repayments table
+        const overdueTable = document.getElementById('overdueRepaymentsTable');
+        if (overdueTable) {
+          if (!overdueSchedules || overdueSchedules.length === 0) {
+            overdueTable.innerHTML = `
+              <tr>
+                <td colspan="8" class="text-center py-4 text-muted">
+                  <i class="fas fa-check-circle me-2"></i>
+                  No overdue repayments
+                </td>
+              </tr>
+            `;
+          } else {
+            let totalOverdue = 0;
+            
+            overdueTable.innerHTML = overdueSchedules.map(schedule => {
+              const dueDate = new Date(schedule.due_date);
+              const today = new Date();
+              const daysOverdue = Math.floor((today - dueDate) / (1000 * 60 * 60 * 24));
+              const penalty = schedule.expected_amount * 0.01 * daysOverdue; // 1% per day
+              const totalDue = schedule.expected_amount + penalty;
+              
+              totalOverdue += totalDue;
+              
+              return `
+                <tr>
+                  <td>${schedule.loans?.profiles?.full_name || 'Unknown'}</td>
+                  <td>#${schedule.loans?.id.toString().padStart(4, '0')}</td>
+                  <td>${dueDate.toLocaleDateString()}</td>
+                  <td class="amount-cell">${schedule.expected_amount.toLocaleString()}</td>
+                  <td><span class="badge bg-danger">${daysOverdue} days</span></td>
+                  <td class="amount-cell">${penalty.toFixed(2)}</td>
+                  <td class="amount-cell amount-negative">${totalDue.toLocaleString()}</td>
+                  <td>
+                    <button class="treasurer-action-btn btn-collect" onclick="collectOverdueRepayment(${schedule.id})">
+                      <i class="fas fa-money-bill-wave"></i> Collect
+                    </button>
+                  </td>
+                </tr>
+              `;
+            }).join('');
+            
+            document.getElementById('overdueRepaymentsTotal').textContent = totalOverdue.toLocaleString();
+          }
+        }
+        
+        // Load recent repayments
+        const { data: recentRepayments, error: repaymentsError } = await supabase
+          .from('repayments')
+          .select(`
+            *,
+            loans!inner(
+              id,
+              profiles!loans_member_id_fkey(full_name)
+            )
+          `)
+          .order('payment_date', { ascending: false })
+          .limit(10);
+        
+        if (!repaymentsError && recentRepayments) {
+          const recentTable = document.getElementById('recentRepaymentsTable');
+          if (recentTable) {
+            recentTable.innerHTML = recentRepayments.map(repayment => `
+              <tr>
+                <td>${new Date(repayment.payment_date).toLocaleDateString()}</td>
+                <td>${repayment.loans?.profiles?.full_name || 'Unknown'}</td>
+                <td>#${repayment.loans?.id.toString().padStart(4, '0')}</td>
+                <td class="amount-cell amount-positive">${parseFloat(repayment.amount_paid).toLocaleString()}</td>
+                <td>${repayment.payment_method || 'N/A'}</td>
+                <td>${repayment.transaction_ref || 'N/A'}</td>
+                <td>Treasurer</td>
+                <td>
+                  <button class="treasurer-action-btn" onclick="viewRepaymentDetails(${repayment.id})">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </td>
+              </tr>
+            `).join('');
+          }
+        }
+        
+        // Calculate totals
+        const { data: allRepayments, error: allRepaymentsError } = await supabase
+          .from('repayments')
+          .select('amount_paid');
+        
+        if (!allRepaymentsError && allRepayments) {
+          const totalCollected = allRepayments.reduce((sum, r) => sum + parseFloat(r.amount_paid || 0), 0);
+          document.getElementById('repaymentsCollected').textContent = totalCollected.toLocaleString();
+        }
+        
+        // Calculate total due from all repayment schedules
+        const { data: allSchedules, error: schedulesError } = await supabase
+          .from('repayment_schedules')
+          .select('expected_amount, is_paid');
+        
+        if (!schedulesError && allSchedules) {
+          const totalDue = allSchedules.reduce((sum, s) => sum + parseFloat(s.expected_amount || 0), 0);
+          const totalPaid = allSchedules
+            .filter(s => s.is_paid)
+            .reduce((sum, s) => sum + parseFloat(s.expected_amount || 0), 0);
+          
+          document.getElementById('totalDue').textContent = totalDue.toLocaleString();
+          
+          const repaymentRate = totalDue > 0 ? Math.round((totalPaid / totalDue) * 100) : 0;
+          document.getElementById('repaymentRate').textContent = `${repaymentRate}%`;
+        }
+        
+      } catch (error) {
+        console.error('Error loading repayments data:', error);
+        showTreasurerError('Failed to load repayments data');
+      }
+    }
+    
+    // Helper Functions
+    function getMonthName(monthNumber) {
+      const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                     'July', 'August', 'September', 'October', 'November', 'December'];
+      return months[monthNumber - 1] || 'Unknown';
+    }
+    
+    async function loadRecentTransactions() {
+      try {
+        // Combine contributions and repayments for recent transactions
+        const { data: contributions, error: contribError } = await supabase
+          .from('contributions')
+          .select('amount, created_at, member_id, profiles!inner(full_name)')
+          .order('created_at', { ascending: false })
+          .limit(10);
+        
+        const { data: repayments, error: repayError } = await supabase
+          .from('repayments')
+          .select('amount_paid, payment_date, loan_id, loans!inner(profiles!inner(full_name))')
+          .order('payment_date', { ascending: false })
+          .limit(10);
+        
+        const transactions = [];
+        
+        if (!contribError && contributions) {
+          contributions.forEach(contrib => {
+            transactions.push({
+              date: contrib.created_at,
+              type: 'Contribution',
+              member: contrib.profiles?.full_name,
+              description: 'Monthly Contribution',
+              amount: parseFloat(contrib.amount),
+              status: 'completed'
+            });
+          });
+        }
+        
+        if (!repayError && repayments) {
+          repayments.forEach(repay => {
+            transactions.push({
+              date: repay.payment_date,
+              type: 'Repayment',
+              member: repay.loans?.profiles?.full_name,
+              description: 'Loan Repayment',
+              amount: parseFloat(repay.amount_paid),
+              status: 'completed'
+            });
+          });
+        }
+        
+        // Sort by date and take top 10
+        transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+        const recentTransactions = transactions.slice(0, 10);
+        
+        // Update table
+        const tableBody = document.getElementById('recentTransactionsTable');
+        if (tableBody) {
+          tableBody.innerHTML = recentTransactions.map(trans => `
+            <tr>
+              <td>${new Date(trans.date).toLocaleDateString()}</td>
+              <td><span class="badge ${trans.type === 'Contribution' ? 'bg-success' : 'bg-primary'}">${trans.type}</span></td>
+              <td>${trans.member || 'Unknown'}</td>
+              <td>${trans.description}</td>
+              <td class="amount-cell ${trans.type === 'Contribution' ? 'amount-positive' : 'amount-negative'}">${trans.amount.toLocaleString()}</td>
+              <td class="amount-cell">${(trans.amount * (trans.type === 'Contribution' ? 1 : -1)).toLocaleString()}</td>
+              <td><span class="financial-status-badge status-collected">${trans.status}</span></td>
+            </tr>
+          `).join('');
+        }
+        
+      } catch (error) {
+        console.error('Error loading recent transactions:', error);
+      }
+    }
+    
+    function initializeFinancialCharts() {
+      // Financial Performance Chart
+      const performanceCtx = document.getElementById('financialPerformanceChart');
+      if (performanceCtx) {
+        new Chart(performanceCtx.getContext('2d'), {
+          type: 'line',
+          data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [
+              {
+                label: 'Contributions',
+                data: [85000, 92000, 78000, 105000, 98200, 112000],
+                borderColor: '#198754',
+                backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+              },
+              {
+                label: 'Loan Disbursements',
+                data: [50000, 45000, 60000, 55000, 48000, 52000],
+                borderColor: '#0d6efd',
+                backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+              },
+              {
+                label: 'Repayments',
+                data: [45000, 48000, 52000, 50000, 55000, 58000],
+                borderColor: '#fd7e14',
+                backgroundColor: 'rgba(253, 126, 20, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'top',
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  callback: function(value) {
+                    return 'Ksh ' + value.toLocaleString();
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+      
+      // Revenue Sources Chart
+      const revenueCtx = document.getElementById('revenueSourcesChart');
+      if (revenueCtx) {
+        new Chart(revenueCtx.getContext('2d'), {
+          type: 'doughnut',
+          data: {
+            labels: ['Contributions', 'Loan Interest', 'Penalties', 'Other'],
+            datasets: [{
+              data: [75, 15, 5, 5],
+              backgroundColor: ['#198754', '#0d6efd', '#fd7e14', '#6c757d'],
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom'
+              }
+            }
+          }
+        });
+      }
+    }
+    
+    function initializeCollectionTrendChart() {
+      const trendCtx = document.getElementById('collectionTrendChart');
+      if (trendCtx) {
+        new Chart(trendCtx.getContext('2d'), {
+          type: 'bar',
+          data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+              label: 'Collection Rate (%)',
+              data: [85, 92, 78, 95, 88, 96],
+              backgroundColor: 'rgba(25, 135, 84, 0.7)',
+              borderColor: '#198754',
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true,
+                max: 100,
+                ticks: {
+                  callback: function(value) {
+                    return value + '%';
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+    }
+    
+    function populateContributionFilters(members) {
+      // Populate member filter
+      const memberFilter = document.getElementById('contributionMemberFilter');
+      if (memberFilter && members) {
+        members.forEach(member => {
+          const option = document.createElement('option');
+          option.value = member.id;
+          option.textContent = member.full_name;
+          memberFilter.appendChild(option);
+        });
+      }
+      
+      // Populate month filter
+      const monthFilter = document.getElementById('contributionMonthFilter');
+      if (monthFilter) {
+        const months = ['January', 'February', 'March', 'April', 'May', 'June',
+                       'July', 'August', 'September', 'October', 'November', 'December'];
+        months.forEach((month, index) => {
+          const option = document.createElement('option');
+          option.value = index + 1;
+          option.textContent = month;
+          monthFilter.appendChild(option);
+        });
+      }
+      
+      // Populate year filter
+      const yearFilter = document.getElementById('contributionYearFilter');
+      if (yearFilter) {
+        const currentYear = new Date().getFullYear();
+        for (let year = currentYear; year >= currentYear - 5; year--) {
+          const option = document.createElement('option');
+          option.value = year;
+          option.textContent = year;
+          yearFilter.appendChild(option);
+        }
+      }
+    }
+    
+    // Setup Event Listeners
+    function setupTreasurerEventListeners() {
+      // Sidebar toggle
+      if (treasurerSidebarToggle) {
+        treasurerSidebarToggle.addEventListener('click', () => {
+          treasurerSidebar.classList.toggle('collapsed');
+          const icon = treasurerSidebarToggle.querySelector('i');
+          icon.classList.toggle('fa-chevron-left');
+          icon.classList.toggle('fa-chevron-right');
+        });
+      }
+      
+      // Mobile menu toggle
+      if (treasurerMobileMenuBtn) {
+        treasurerMobileMenuBtn.addEventListener('click', () => {
+          treasurerSidebar.classList.toggle('mobile-open');
+        });
+      }
+      
+      // Menu item clicks
+      treasurerMenuItems.forEach(item => {
+        item.addEventListener('click', async (e) => {
+          e.preventDefault();
+          const page = item.getAttribute('data-page');
+          if (page) {
+            await switchPage(page);
+          }
+        });
+      });
+      
+      // Record transaction button
+      document.getElementById('recordTransactionBtn')?.addEventListener('click', () => {
+        const modal = new bootstrap.Modal(document.getElementById('recordTransactionModal'));
+        modal.show();
+      });
+      
+      // New disbursement button
+      document.getElementById('newDisbursementBtn')?.addEventListener('click', () => {
+        const modal = new bootstrap.Modal(document.getElementById('disburseLoanModal'));
+        modal.show();
+      });
+      
+      // Bulk collection button
+      document.getElementById('bulkCollectionBtn')?.addEventListener('click', () => {
+        const modal = new bootstrap.Modal(document.getElementById('bulkCollectionModal'));
+        modal.show();
+      });
+      
+      // Calculate interest button
+      document.getElementById('calculateInterestBtn')?.addEventListener('click', calculateInterest);
+      
+      // Calculate share-out button
+      document.getElementById('calculateShareoutBtn')?.addEventListener('click', calculateShareout);
+      
+      // Generate report button
+      document.getElementById('generateReportBtn')?.addEventListener('click', generateReport);
+      
+      // Report option cards
+      document.querySelectorAll('.report-option-card').forEach(card => {
+        card.addEventListener('click', function() {
+          const reportType = this.getAttribute('data-report');
+          selectReportType(reportType);
+        });
+      });
+      
+      // Logout button
+      document.getElementById('treasurerLogoutBtn')?.addEventListener('click', logoutTreasurer);
+      
+      // Close mobile menu when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!treasurerSidebar.contains(e.target) && !treasurerMobileMenuBtn.contains(e.target)) {
+          treasurerSidebar.classList.remove('mobile-open');
+        }
+      });
+    }
+    
+    // Action Functions
+    async function collectContribution(memberId, memberName) {
+      try {
+        const amount = prompt(`Enter contribution amount for ${memberName}:`, '5000');
+        if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
+          showTreasurerError('Please enter a valid amount');
+          return;
+        }
+        
+        const currentMonth = new Date().getMonth() + 1;
+        const currentYear = new Date().getFullYear();
+        
+        const { error } = await supabase
+          .from('contributions')
+          .insert({
+            member_id: memberId,
+            amount: parseFloat(amount),
+            contribution_month: currentMonth,
+            contribution_year: currentYear,
+            payment_method: 'cash',
+            recorded_by: currentTreasurer.id
+          });
+        
+        if (error) throw error;
+        
+        showTreasurerSuccess(`Contribution of Ksh ${amount} recorded for ${memberName}`);
+        
+        // Refresh data
+        await loadContributionsManagementData();
+        await loadFinancialDashboardData();
+        
+      } catch (error) {
+        console.error('Error recording contribution:', error);
+        showTreasurerError('Failed to record contribution');
+      }
+    }
+    
+    async function disburseLoan(loanId) {
+      try {
+        const confirmation = confirm('Are you sure you want to disburse this loan?');
+        if (!confirmation) return;
+        
+        const { error } = await supabase
+          .from('loans')
+          .update({
+            disbursed_at: new Date().toISOString(),
+            disbursed_by: currentTreasurer.id,
+            status: 'disbursed'
+          })
+          .eq('id', loanId);
+        
+        if (error) throw error;
+        
+        showTreasurerSuccess('Loan disbursed successfully');
+        
+        // Refresh data
+        await loadLoanDisbursementData();
+        await loadFinancialDashboardData();
+        
+      } catch (error) {
+        console.error('Error disbursing loan:', error);
+        showTreasurerError('Failed to disburse loan');
+      }
+    }
+    
+    function calculateInterest() {
+      const principal = parseFloat(document.getElementById('interestPrincipal').value) || 0;
+      const rate = parseFloat(document.getElementById('interestRate').value) || 0;
+      const period = parseInt(document.getElementById('interestPeriod').value) || 0;
+      const type = document.getElementById('interestType').value;
+      
+      if (principal <= 0 || rate <= 0 || period <= 0) {
+        showTreasurerError('Please enter valid values for principal, rate, and period');
+        return;
+      }
+      
+      let interest, total, monthly;
+      
+      if (type === 'simple') {
+        interest = principal * (rate / 100) * (period / 12);
+        total = principal + interest;
+        monthly = total / period;
+      } else {
+        // Compound interest
+        const monthlyRate = rate / 100 / 12;
+        total = principal * Math.pow(1 + monthlyRate, period);
+        interest = total - principal;
+        monthly = total / period;
+      }
+      
+      // Display results
+      document.getElementById('resultPrincipal').textContent = principal.toLocaleString();
+      document.getElementById('resultInterest').textContent = interest.toLocaleString();
+      document.getElementById('resultTotal').textContent = total.toLocaleString();
+      document.getElementById('resultMonthly').textContent = monthly.toLocaleString();
+      document.getElementById('interestResult').style.display = 'block';
+    }
+    
+    function calculateShareout() {
+      const totalAmount = parseFloat(document.getElementById('shareoutTotal').value) || 0;
+      const method = document.getElementById('shareoutMethod').value;
+      
+      if (totalAmount <= 0) {
+        showTreasurerError('Please enter a valid total amount');
+        return;
+      }
+      
+      // In a real application, this would fetch member data and calculate based on method
+      const memberCount = 10; // Example count
+      const sharePerMember = totalAmount / memberCount;
+      
+      const distributionDiv = document.getElementById('shareoutDistribution');
+      distributionDiv.innerHTML = `
+        <div class="alert alert-success">
+          <strong>Total Amount:</strong> Ksh ${totalAmount.toLocaleString()}<br>
+          <strong>Number of Members:</strong> ${memberCount}<br>
+          <strong>Share per Member:</strong> Ksh ${sharePerMember.toLocaleString()}
+        </div>
+        <div class="shareout-member-item">
+          <span>Total Members</span>
+          <span>${memberCount}</span>
+        </div>
+        <div class="shareout-member-item">
+          <span>Total Amount</span>
+          <span class="currency">${totalAmount.toLocaleString()}</span>
+        </div>
+        <div class="shareout-member-item">
+          <span>Share per Member</span>
+          <span class="currency">${sharePerMember.toLocaleString()}</span>
+        </div>
+      `;
+      
+      document.getElementById('shareoutSummary').style.display = 'block';
+    }
+    
+    function selectReportType(reportType) {
+      document.getElementById('reportParameters').style.display = 'block';
+      // You can customize parameters based on report type
+    }
+    
+    function generateReport() {
+      const reportType = 'balance-sheet'; // This would be determined from selection
+      const period = document.getElementById('reportPeriod').value;
+      const startDate = document.getElementById('reportStartDate').value;
+      const endDate = document.getElementById('reportEndDate').value;
+      
+      showTreasurerSuccess(`Generating ${reportType} report for ${period} period...`);
+      // In a real application, this would generate and download a report
+    }
+    
+    // Other page data loaders (simplified for brevity)
+    async function loadInterestCalculationData() {
+      // Load loan data for interest calculation
+    }
+    
+    async function loadShareoutCalculationData() {
+      // Load share-out history and member data
+    }
+    
+    async function loadFinancialReportsData() {
+      // Load report history
+    }
+    
+    async function loadBankStatementsData() {
+      // Load bank statement history
+    }
+    
+    async function loadAuditTrailData() {
+      // Load audit log data
+    }
+    
+    async function loadFinancialSettingsData() {
+      // Load financial settings
+    }
+    
+    function initializeFinancialDashboard() {
+      // Initialize any dashboard-specific functionality
+      console.log('Financial dashboard initialized');
+    }
+    
+    // Show Success Message
+    function showTreasurerSuccess(message) {
+      // You can implement a toast notification
+      alert(message); // Temporary
+    }
+    
+    // Show Error Message
+    function showTreasurerError(message) {
+      // You can implement a toast notification
+      alert(message); // Temporary
+    }
+    
+    // Logout Function
+    async function logoutTreasurer() {
+      try {
+        await supabase.auth.signOut();
+        window.location.href = 'login.html';
+      } catch (error) {
+        console.error('Error logging out:', error);
+        showTreasurerError('Logout failed. Please try again.');
+      }
+    }
+    
+    // Make functions available globally
+    window.switchPage = switchPage;
+    window.collectContribution = collectContribution;
+    window.disburseLoan = disburseLoan;
+    window.calculateInterest = calculateInterest;
+    window.calculateShareout = calculateShareout;
+    window.logoutTreasurer = logoutTreasurer;
+    
+  </script>
+</body>
+</html>

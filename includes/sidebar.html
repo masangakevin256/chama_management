@@ -1,0 +1,70 @@
+<style>
+    .app-sidebar { background: linear-gradient(180deg,#0d6efd,#6610f2); color: #fff; min-height:100vh; padding:12px; }
+    .app-sidebar a { color: #fff !important; }
+    .app-sidebar .section-title { font-size:12px; opacity:0.9; margin-top:12px; margin-bottom:6px }
+    .app-sidebar .list-group-item { background:transparent; border:0; padding-left:0 }
+</style>
+
+<div class="app-sidebar">
+    <div class="d-flex align-items-center mb-3">
+        <div style="width:44px;height:44px;background:rgba(255,255,255,0.12);border-radius:8px;display:flex;align-items:center;justify-content:center;margin-right:8px">
+            <i class="fas fa-users"></i>
+        </div>
+        <div>
+            <div style="font-weight:700">Chama Suite</div>
+            <div style="font-size:12px;opacity:0.9">Shared Savings & Lending</div>
+        </div>
+    </div>
+
+    <div>
+        <a id="dashboardLink" href="#" class="d-block mb-2">Dashboard</a>
+    </div>
+
+    <div id="chairLinks" class="d-none">
+        <div class="section-title">CHAIRPERSON</div>
+        <a href="/frontend/dashboards/chairperson/overview.html">Overview</a>
+        <a href="/frontend/dashboards/chairperson/approval.html">Approvals</a>
+        <a href="/frontend/dashboards/chairperson/financial-summary.html">Financial Summary</a>
+        <a href="/frontend/dashboards/chairperson/report.html">Reports</a>
+        <a href="/frontend/dashboards/chairperson/shareout.html">Share Out</a>
+    </div>
+
+    <div id="treasurerLinks" class="d-none">
+        <div class="section-title">TREASURER</div>
+        <a href="/frontend/dashboards/treasurer/contribution.html">Contributions</a>
+        <a href="/frontend/dashboards/treasurer/loan.html">Loans</a>
+        <a href="/frontend/dashboards/treasurer/repayment.html">Repayments</a>
+        <a href="/frontend/dashboards/treasurer/interest.html">Interest</a>
+        <a href="/frontend/dashboards/treasurer/reports.html">Reports</a>
+        <a href="/frontend/dashboards/treasurer/shareout.html">Share Out</a>
+    </div>
+
+    <div id="memberLinks" class="d-none">
+        <div class="section-title">MEMBER</div>
+        <a href="/frontend/dashboards/member/profile.html">My Profile</a>
+        <a href="/frontend/dashboards/member/contribution.html">My Contributions</a>
+        <a href="/frontend/dashboards/member/loan.html">My Loans</a>
+        <a href="/frontend/dashboards/member/repayments.html">My Repayments</a>
+        <a href="/frontend/dashboards/member/statements.html">Statements</a>
+    </div>
+
+    <div class="mt-4">
+        <a href="/frontend/index.html" class="d-block">Sign out</a>
+    </div>
+
+    <script>
+        // Set dashboard link according to stored role and reveal role sections
+        (function(){
+            const role = sessionStorage.getItem('chama_user_role') || '';
+            const dashboardLink = document.getElementById('dashboardLink');
+            if (role) {
+                dashboardLink.href = `/frontend/dashboards/${role}/dashboard.html`;
+            } else {
+                dashboardLink.href = '/frontend/index.html';
+            }
+            if (role === 'chairperson') document.getElementById('chairLinks').classList.remove('d-none');
+            if (role === 'treasurer') document.getElementById('treasurerLinks').classList.remove('d-none');
+            if (role === 'member') document.getElementById('memberLinks').classList.remove('d-none');
+        })();
+    </script>
+</div>

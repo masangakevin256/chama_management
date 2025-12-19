@@ -1,0 +1,1644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Member Dashboard | Chama Management Suite</title>
+  
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="member-dashboard.css">
+</head>
+<body>
+  <!-- Member Dashboard Container -->
+  <div class="member-dashboard-container">
+    
+    <!-- Sidebar -->
+    <aside class="member-sidebar" id="memberSidebar">
+      <div class="member-sidebar-header">
+        <h3><i class="fas fa-users"></i> <span class="member-menu-text">Chama Member</span></h3>
+        <button class="sidebar-toggle" id="memberSidebarToggle">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+      </div>
+      
+      <!-- User Info -->
+      <div class="member-user-info">
+        <div class="member-avatar" id="memberAvatar">
+          <!-- Initial will be filled by JS -->
+        </div>
+        <div class="member-name" id="memberFullName">Loading...</div>
+        <div class="member-role">Member</div>
+        <div class="member-meta">
+          <div><i class="fas fa-id-card"></i> <span id="memberId">ID: Loading...</span></div>
+          <div><i class="fas fa-calendar-alt"></i> Joined: <span id="joinDate">Loading...</span></div>
+        </div>
+      </div>
+      
+      <!-- Sidebar Menu -->
+      <nav class="member-menu">
+        <a href="#dashboard" class="member-menu-item active" data-page="dashboard">
+          <i class="fas fa-tachometer-alt"></i>
+          <span class="member-menu-text">Dashboard</span>
+        </a>
+        
+        <a href="#contributions" class="member-menu-item" data-page="contributions">
+          <i class="fas fa-hand-holding-usd"></i>
+          <span class="member-menu-text">My Contributions</span>
+          <span class="member-menu-badge" id="pendingContributions">0</span>
+        </a>
+        
+        <a href="#loans" class="member-menu-item" data-page="loans">
+          <i class="fas fa-landmark"></i>
+          <span class="member-menu-text">My Loans</span>
+          <span class="member-menu-badge" id="activeLoansCount">0</span>
+        </a>
+        
+        <a href="#repayments" class="member-menu-item" data-page="repayments">
+          <i class="fas fa-money-check-alt"></i>
+          <span class="member-menu-text">Repayment Schedule</span>
+        </a>
+        
+        <a href="#statements" class="member-menu-item" data-page="statements">
+          <i class="fas fa-file-invoice-dollar"></i>
+          <span class="member-menu-text">Personal Statements</span>
+        </a>
+        
+        <a href="#profile" class="member-menu-item" data-page="profile">
+          <i class="fas fa-user-cog"></i>
+          <span class="member-menu-text">Profile Management</span>
+        </a>
+        
+        <a href="#notifications" class="member-menu-item" data-page="notifications">
+          <i class="fas fa-bell"></i>
+          <span class="member-menu-text">Notifications</span>
+          <span class="member-menu-badge" id="unreadNotifications">0</span>
+        </a>
+        
+        <div class="mt-4">
+          <a href="#" class="member-menu-item" id="memberLogoutBtn">
+            <i class="fas fa-sign-out-alt"></i>
+            <span class="member-menu-text">Logout</span>
+          </a>
+        </div>
+      </nav>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="member-main-content">
+      <!-- Header -->
+      <header class="member-header">
+        <div class="member-header-left">
+          <button class="member-mobile-menu-btn" id="memberMobileMenuBtn">
+            <i class="fas fa-bars"></i>
+          </button>
+          <h1 id="memberPageTitle">Member Dashboard</h1>
+          <p id="memberPageSubtitle">Welcome back to your chama portal</p>
+        </div>
+        
+        <div class="member-header-right">
+          <div class="dropdown">
+            <button class="btn btn-outline-primary dropdown-toggle" type="button" id="quickActionsDropdown" data-bs-toggle="dropdown">
+              <i class="fas fa-bolt me-2"></i>Quick Actions
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="#" id="makeContributionBtn"><i class="fas fa-money-bill-wave me-2"></i>Make Contribution</a></li>
+              <li><a class="dropdown-item" href="#" id="applyLoanBtn"><i class="fas fa-hand-holding-usd me-2"></i>Apply for Loan</a></li>
+              <li><a class="dropdown-item" href="#" id="downloadStatementBtn"><i class="fas fa-download me-2"></i>Download Statement</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#profile"><i class="fas fa-user-edit me-2"></i>Update Profile</a></li>
+            </ul>
+          </div>
+          
+          <button class="notification-btn" id="memberNotificationBtn">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge" id="notificationBadge">0</span>
+          </button>
+        </div>
+      </header>
+      
+      <!-- Content Area -->
+      <div class="member-content">
+        
+        <!-- Dashboard Page -->
+        <div id="dashboardPage" class="page-content">
+          <!-- Welcome Card -->
+          <div class="member-card mb-4">
+            <div class="row align-items-center">
+              <div class="col-md-8">
+                <h3 class="mb-3">Welcome, <span id="welcomeName">Member</span>! 👋</h3>
+                <p class="text-muted mb-0">Here's your financial overview for today. Stay updated with your contributions, loans, and chama activities.</p>
+              </div>
+              <div class="col-md-4 text-end">
+                <div class="member-card-icon d-inline-flex">
+                  <i class="fas fa-chart-line"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Member Stats Cards -->
+          <div class="member-cards">
+            <div class="member-card">
+              <div class="member-card-icon">
+                <i class="fas fa-hand-holding-usd"></i>
+              </div>
+              <h4 class="member-card-title">Total Contributions</h4>
+              <div class="member-card-value">Ksh <span id="totalMemberContributions">0</span></div>
+              <p class="member-card-subtext">This year: Ksh <span id="yearContributions">0</span></p>
+              
+              <div class="contribution-progress">
+                <div class="progress-label">
+                  <span>Monthly Target</span>
+                  <span id="monthlyProgress">0%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" id="monthlyProgressBar" style="width: 0%"></div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="member-card">
+              <div class="member-card-icon" style="background: linear-gradient(135deg, #20c997, #28a745);">
+                <i class="fas fa-piggy-bank"></i>
+              </div>
+              <h4 class="member-card-title">My Savings</h4>
+              <div class="member-card-value">Ksh <span id="totalSavings">0</span></div>
+              <p class="member-card-subtext">Available balance</p>
+              
+              <div class="mt-3">
+                <button class="btn btn-sm btn-outline-success w-100" id="viewSavingsBtn">
+                  <i class="fas fa-eye me-1"></i> View Details
+                </button>
+              </div>
+            </div>
+            
+            <div class="member-card">
+              <div class="member-card-icon" style="background: linear-gradient(135deg, #ff7e5f, #feb47b);">
+                <i class="fas fa-landmark"></i>
+              </div>
+              <h4 class="member-card-title">Active Loans</h4>
+              <div class="member-card-value">Ksh <span id="memberActiveLoans">0</span></div>
+              <p class="member-card-subtext"><span id="loansCount">0</span> active loan(s)</p>
+              
+              <div class="mt-3">
+                <button class="btn btn-sm btn-outline-warning w-100" id="viewLoansBtn">
+                  <i class="fas fa-list me-1"></i> View All Loans
+                </button>
+              </div>
+            </div>
+            
+            <div class="member-card">
+              <div class="member-card-icon" style="background: linear-gradient(135deg, #6f42c1, #a370f7);">
+                <i class="fas fa-calendar-check"></i>
+              </div>
+              <h4 class="member-card-title">Next Meeting</h4>
+              <div class="member-card-value" id="nextMeetingDate">--</div>
+              <p class="member-card-subtext" id="nextMeetingTime">No meeting scheduled</p>
+              
+              <div class="mt-3">
+                <button class="btn btn-sm btn-outline-primary w-100" id="viewMeetingsBtn">
+                  <i class="fas fa-calendar me-1"></i> View Calendar
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Recent Activity & Contributions -->
+          <div class="row mt-4">
+            <div class="col-lg-8">
+              <div class="member-table-container">
+                <div class="member-table-header">
+                  <h3><i class="fas fa-history me-2"></i>Recent Contributions</h3>
+                  <a href="#contributions" class="btn btn-sm btn-link">View All</a>
+                </div>
+                <div class="table-responsive">
+                  <table class="table member-table">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Month</th>
+                        <th>Amount</th>
+                        <th>Method</th>
+                        <th>Status</th>
+                        <th>Receipt</th>
+                      </tr>
+                    </thead>
+                    <tbody id="recentContributionsTable">
+                      <!-- Filled by JavaScript -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-lg-4">
+              <div class="member-card">
+                <h4 class="member-card-title mb-3">Quick Actions</h4>
+                <div class="d-grid gap-2">
+                  <button class="btn btn-primary" id="quickContributionBtn">
+                    <i class="fas fa-money-bill-wave me-2"></i>Make Contribution
+                  </button>
+                  <button class="btn btn-success" id="quickLoanApplicationBtn">
+                    <i class="fas fa-hand-holding-usd me-2"></i>Apply for Loan
+                  </button>
+                  <button class="btn btn-info" id="quickStatementBtn">
+                    <i class="fas fa-file-pdf me-2"></i>Download Statement
+                  </button>
+                  <button class="btn btn-warning" id="quickSupportBtn">
+                    <i class="fas fa-headset me-2"></i>Get Support
+                  </button>
+                </div>
+                
+                <div class="mt-4">
+                  <h6 class="mb-2">Upcoming Deadlines</h6>
+                  <div id="upcomingDeadlines">
+                    <!-- Filled by JavaScript -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Contributions Page -->
+        <div id="contributionsPage" class="page-content d-none">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h2><i class="fas fa-hand-holding-usd me-2"></i>My Contributions</h2>
+              <p class="text-muted mb-0">Track all your contributions and payment history</p>
+            </div>
+            <button class="btn btn-primary" id="addContributionBtn">
+              <i class="fas fa-plus me-2"></i>Record Contribution
+            </button>
+          </div>
+          
+          <!-- Contribution Summary -->
+          <div class="row mb-4">
+            <div class="col-md-3">
+              <div class="member-card">
+                <h5 class="member-card-title">Total Paid</h5>
+                <div class="member-card-value">Ksh <span id="totalPaidAmount">0</span></div>
+                <p class="member-card-subtext">All time contributions</p>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="member-card">
+                <h5 class="member-card-title">This Year</h5>
+                <div class="member-card-value">Ksh <span id="yearlyContributions">0</span></div>
+                <p class="member-card-subtext">Year-to-date total</p>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="member-card">
+                <h5 class="member-card-title">Current Month</h5>
+                <div class="member-card-value">Ksh <span id="monthlyContributions">0</span></div>
+                <p class="member-card-subtext">For <span id="currentMonth">Month</span></p>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="member-card">
+                <h5 class="member-card-title">Pending</h5>
+                <div class="member-card-value">Ksh <span id="pendingAmount">0</span></div>
+                <p class="member-card-subtext">Unpaid contributions</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Contribution History -->
+          <div class="member-table-container">
+            <div class="member-table-header">
+              <h3>Contribution History</h3>
+              <div class="member-filter-container">
+                <select class="form-select member-filter-select" id="contributionYearFilter">
+                  <option value="">All Years</option>
+                </select>
+                <select class="form-select member-filter-select" id="contributionMonthFilter">
+                  <option value="">All Months</option>
+                </select>
+                <button class="btn btn-outline-secondary" id="exportContributionsBtn">
+                  <i class="fas fa-download me-1"></i> Export
+                </button>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="table member-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Contribution Period</th>
+                    <th>Amount</th>
+                    <th>Payment Method</th>
+                    <th>Status</th>
+                    <th>Receipt No.</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="contributionsHistoryTable">
+                  <!-- Filled by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+          <!-- Contribution Chart -->
+          <div class="member-card mt-4">
+            <h4 class="member-card-title mb-3">Contribution Trends</h4>
+            <canvas id="contributionChart" height="100"></canvas>
+          </div>
+        </div>
+        
+        <!-- Loans Page -->
+        <div id="loansPage" class="page-content d-none">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h2><i class="fas fa-landmark me-2"></i>My Loans</h2>
+              <p class="text-muted mb-0">View your loan applications and status</p>
+            </div>
+            <button class="btn btn-primary" id="applyNewLoanBtn">
+              <i class="fas fa-hand-holding-usd me-2"></i>Apply for New Loan
+            </button>
+          </div>
+          
+          <!-- Loan Summary -->
+          <div id="loanSummarySection">
+            <!-- Filled by JavaScript -->
+          </div>
+          
+          <!-- Loan Applications -->
+          <div class="member-table-container mt-4">
+            <div class="member-table-header">
+              <h3>Loan Applications</h3>
+            </div>
+            <div id="loanApplicationsList">
+              <!-- Filled by JavaScript -->
+            </div>
+          </div>
+        </div>
+        
+        <!-- Repayment Schedule Page -->
+        <div id="repaymentsPage" class="page-content d-none">
+          <div class="mb-4">
+            <h2><i class="fas fa-money-check-alt me-2"></i>Repayment Schedule</h2>
+            <p class="text-muted">View your loan repayment schedule and make payments</p>
+          </div>
+          
+          <!-- Active Loan Repayments -->
+          <div id="activeLoanRepayments">
+            <!-- Filled by JavaScript -->
+          </div>
+          
+          <!-- Repayment History -->
+          <div class="member-table-container mt-4">
+            <div class="member-table-header">
+              <h3>Repayment History</h3>
+            </div>
+            <div class="table-responsive">
+              <table class="table member-table" id="repaymentHistoryTable">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Loan ID</th>
+                    <th>Amount Paid</th>
+                    <th>Payment Method</th>
+                    <th>Status</th>
+                    <th>Receipt</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Filled by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Statements Page -->
+        <div id="statementsPage" class="page-content d-none">
+          <div class="mb-4">
+            <h2><i class="fas fa-file-invoice-dollar me-2"></i>Personal Statements</h2>
+            <p class="text-muted">View and download your financial statements</p>
+          </div>
+          
+          <!-- Statement Filters -->
+          <div class="member-card mb-4">
+            <div class="row">
+              <div class="col-md-4">
+                <label class="form-label">Statement Period</label>
+                <select class="form-select" id="statementPeriod">
+                  <option value="monthly">Monthly Statement</option>
+                  <option value="quarterly">Quarterly Statement</option>
+                  <option value="yearly">Annual Statement</option>
+                  <option value="custom">Custom Period</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Start Date</label>
+                <input type="date" class="form-control" id="statementStartDate">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">End Date</label>
+                <input type="date" class="form-control" id="statementEndDate">
+              </div>
+            </div>
+            <div class="mt-3">
+              <button class="btn btn-primary" id="generateStatementBtn">
+                <i class="fas fa-file-pdf me-2"></i>Generate Statement
+              </button>
+              <button class="btn btn-outline-secondary ms-2" id="printStatementBtn">
+                <i class="fas fa-print me-2"></i>Print Statement
+              </button>
+            </div>
+          </div>
+          
+          <!-- Statement Preview -->
+          <div id="statementPreview">
+            <!-- Filled by JavaScript -->
+          </div>
+        </div>
+        
+        <!-- Profile Management Page -->
+        <div id="profilePage" class="page-content d-none">
+          <div class="mb-4">
+            <h2><i class="fas fa-user-cog me-2"></i>Profile Management</h2>
+            <p class="text-muted">Update your personal information and preferences</p>
+          </div>
+          
+          <div class="profile-form-container">
+            <!-- Personal Information -->
+            <div class="profile-section">
+              <h4 class="profile-section-title"><i class="fas fa-user me-2"></i>Personal Information</h4>
+              <form id="personalInfoForm">
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-control" id="profileFullName" required>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" class="form-control" id="profileEmail" required>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Phone Number</label>
+                    <input type="tel" class="form-control" id="profilePhone">
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Date of Birth</label>
+                    <input type="date" class="form-control" id="profileDob">
+                  </div>
+                  <div class="col-md-12 mb-3">
+                    <label class="form-label">Address</label>
+                    <textarea class="form-control" id="profileAddress" rows="2"></textarea>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Update Information</button>
+              </form>
+            </div>
+            
+            <!-- Account Settings -->
+            <div class="profile-section">
+              <h4 class="profile-section-title"><i class="fas fa-shield-alt me-2"></i>Security Settings</h4>
+              <form id="securityForm">
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Current Password</label>
+                    <input type="password" class="form-control" id="currentPassword">
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">New Password</label>
+                    <input type="password" class="form-control" id="newPassword">
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-warning">Change Password</button>
+              </form>
+            </div>
+            
+            <!-- Notification Preferences -->
+            <div class="profile-section">
+              <h4 class="profile-section-title"><i class="fas fa-bell me-2"></i>Notification Preferences</h4>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="notifyContributions" checked>
+                <label class="form-check-label" for="notifyContributions">
+                  Contribution reminders
+                </label>
+              </div>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="notifyLoans" checked>
+                <label class="form-check-label" for="notifyLoans">
+                  Loan application updates
+                </label>
+              </div>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="notifyMeetings" checked>
+                <label class="form-check-label" for="notifyMeetings">
+                  Meeting notifications
+                </label>
+              </div>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="notifyAnnouncements" checked>
+                <label class="form-check-label" for="notifyAnnouncements">
+                  Chama announcements
+                </label>
+              </div>
+              <button class="btn btn-secondary mt-2">Save Preferences</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Notifications Page -->
+        <div id="notificationsPage" class="page-content d-none">
+          <div class="mb-4">
+            <h2><i class="fas fa-bell me-2"></i>Notifications</h2>
+            <p class="text-muted">Your chama notifications and alerts</p>
+          </div>
+          
+          <div id="notificationsList">
+            <!-- Filled by JavaScript -->
+          </div>
+        </div>
+        
+      </div>
+    </main>
+  </div>
+  
+  <!-- Modals -->
+  
+  <!-- Make Contribution Modal -->
+  <div class="modal fade" id="makeContributionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fas fa-money-bill-wave me-2"></i>Make Contribution</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="contributionForm">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Contribution Month *</label>
+                <select class="form-select" id="contributionMonth" required>
+                  <option value="">Select Month</option>
+                  <option value="1">January</option>
+                  <option value="2">February</option>
+                  <option value="3">March</option>
+                  <option value="4">April</option>
+                  <option value="5">May</option>
+                  <option value="6">June</option>
+                  <option value="7">July</option>
+                  <option value="8">August</option>
+                  <option value="9">September</option>
+                  <option value="10">October</option>
+                  <option value="11">November</option>
+                  <option value="12">December</option>
+                </select>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Year *</label>
+                <select class="form-select" id="contributionYear" required>
+                  <option value="">Select Year</option>
+                </select>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Amount (Ksh) *</label>
+                <input type="number" class="form-control" id="contributionAmount" min="0" step="0.01" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Payment Method *</label>
+                <select class="form-select" id="paymentMethod" required>
+                  <option value="">Select Method</option>
+                  <option value="mpesa">M-Pesa</option>
+                  <option value="bank">Bank Transfer</option>
+                  <option value="cash">Cash</option>
+                  <option value="cheque">Cheque</option>
+                </select>
+              </div>
+              <div class="col-md-12 mb-3">
+                <label class="form-label">Transaction Reference</label>
+                <input type="text" class="form-control" id="transactionRef" placeholder="M-Pesa code, bank reference, etc.">
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="submitContributionBtn">Submit Contribution</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Apply for Loan Modal -->
+  <div class="modal fade" id="applyLoanModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fas fa-hand-holding-usd me-2"></i>Apply for Loan</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="loanApplicationForm">
+            <!-- Form will be filled by JavaScript -->
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="submitLoanApplicationBtn">Submit Application</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Custom JavaScript -->
+  <script type="module">
+    // Import Supabase configuration
+    import supabase from "./supabase/supabase.js";
+    
+    // Global state
+    let currentMember = null;
+    let memberProfile = null;
+    let currentPage = 'dashboard';
+    
+    // DOM Elements
+    const memberSidebar = document.getElementById('memberSidebar');
+    const memberSidebarToggle = document.getElementById('memberSidebarToggle');
+    const memberMobileMenuBtn = document.getElementById('memberMobileMenuBtn');
+    const memberMenuItems = document.querySelectorAll('.member-menu-item');
+    const pageContents = document.querySelectorAll('.page-content');
+    const memberPageTitle = document.getElementById('memberPageTitle');
+    const memberPageSubtitle = document.getElementById('memberPageSubtitle');
+    
+    // Initialize Member Dashboard
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        // Check authentication
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        if (authError || !user) {
+          window.location.href = 'login.html';
+          return;
+        }
+        
+        // Load member data
+        await loadMemberData(user);
+        
+        // Load initial page data
+        await switchPage('dashboard');
+        
+        // Setup event listeners
+        setupMemberEventListeners();
+        
+        // Initialize dashboard widgets
+        initializeMemberDashboard();
+        
+      } catch (error) {
+        console.error('Member dashboard initialization error:', error);
+        showMemberError('Error loading dashboard. Please try again.');
+      }
+    });
+    
+    // Load Member Data
+    async function loadMemberData(user) {
+      try {
+        // Get member profile
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+        
+        if (profileError) throw profileError;
+        
+        if (!profile) {
+          await supabase.auth.signOut();
+          window.location.href = 'login.html';
+          return;
+        }
+        
+        // Check if user is a member
+        if (profile.role !== 'member') {
+          // Redirect to appropriate dashboard
+          window.location.href = `dashboards/${profile.role}/dashboard.html`;
+          return;
+        }
+        
+        memberProfile = profile;
+        
+        // Get member-specific data
+        const { data: memberData, error: memberError } = await supabase
+          .from('members')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+        
+        currentMember = {
+          ...profile,
+          ...(memberData || {})
+        };
+        
+        // Update UI with member info
+        updateMemberUI();
+        
+      } catch (error) {
+        console.error('Error loading member data:', error);
+        throw error;
+      }
+    }
+    
+    // Update Member UI
+    function updateMemberUI() {
+      if (!currentMember) return;
+      
+      // Update avatar with initial
+      const avatar = document.getElementById('memberAvatar');
+      if (avatar) {
+        avatar.innerHTML = currentMember.full_name.charAt(0).toUpperCase();
+      }
+      
+      // Update name fields
+      document.getElementById('memberFullName').textContent = currentMember.full_name;
+      document.getElementById('welcomeName').textContent = currentMember.full_name.split(' ')[0];
+      
+      // Update member ID
+      document.getElementById('memberId').textContent = currentMember.membership_no ? 
+        `ID: ${currentMember.membership_no}` : 'ID: Not assigned';
+      
+      // Update join date
+      if (currentMember.join_date) {
+        document.getElementById('joinDate').textContent = new Date(currentMember.join_date).toLocaleDateString();
+      }
+    }
+    
+    // Switch Page Function
+    async function switchPage(page) {
+      currentPage = page;
+      
+      // Hide all pages
+      pageContents.forEach(p => p.classList.add('d-none'));
+      
+      // Show selected page
+      const pageElement = document.getElementById(`${page}Page`);
+      if (!pageElement) {
+        console.error(`Page ${page} not found`);
+        return;
+      }
+      
+      pageElement.classList.remove('d-none');
+      
+      // Update page title and subtitle
+      updateMemberPageTitle(page);
+      
+      // Load page-specific data
+      await loadMemberPageData(page);
+      
+      // Update active menu item
+      updateActiveMemberMenuItem(page);
+    }
+    
+    // Update Member Page Title
+    function updateMemberPageTitle(page) {
+      const pageTitles = {
+        dashboard: { title: 'Member Dashboard', subtitle: 'Welcome to your chama portal' },
+        contributions: { title: 'My Contributions', subtitle: 'Track and manage your contributions' },
+        loans: { title: 'My Loans', subtitle: 'View loan applications and status' },
+        repayments: { title: 'Repayment Schedule', subtitle: 'Loan repayment schedule and history' },
+        statements: { title: 'Personal Statements', subtitle: 'Financial statements and reports' },
+        profile: { title: 'Profile Management', subtitle: 'Update your personal information' },
+        notifications: { title: 'Notifications', subtitle: 'Chama notifications and alerts' }
+      };
+      
+      const pageInfo = pageTitles[page] || { 
+        title: page.charAt(0).toUpperCase() + page.slice(1), 
+        subtitle: '' 
+      };
+      
+      memberPageTitle.textContent = pageInfo.title;
+      memberPageSubtitle.textContent = pageInfo.subtitle;
+    }
+    
+    // Update Active Menu Item
+    function updateActiveMemberMenuItem(page) {
+      memberMenuItems.forEach(item => {
+        item.classList.remove('active');
+        if (item.getAttribute('data-page') === page) {
+          item.classList.add('active');
+        }
+      });
+    }
+    
+    // Load Member Page Data
+    async function loadMemberPageData(page) {
+      try {
+        switch(page) {
+          case 'dashboard':
+            await loadMemberDashboardData();
+            break;
+          case 'contributions':
+            await loadMemberContributionsData();
+            break;
+          case 'loans':
+            await loadMemberLoansData();
+            break;
+          case 'repayments':
+            await loadMemberRepaymentsData();
+            break;
+          case 'statements':
+            await loadMemberStatementsData();
+            break;
+          case 'profile':
+            await loadMemberProfileData();
+            break;
+          case 'notifications':
+            await loadMemberNotifications();
+            break;
+          default:
+            console.log(`No data loader for ${page}`);
+        }
+      } catch (error) {
+        console.error(`Error loading ${page} data:`, error);
+        showMemberError(`Failed to load ${page} data`);
+      }
+    }
+    
+    // Load Member Dashboard Data
+    async function loadMemberDashboardData() {
+      try {
+        if (!currentMember) return;
+        
+        // Load total contributions
+        const { data: contributions, error: contributionsError } = await supabase
+          .from('contributions')
+          .select('amount, contribution_month, contribution_year, created_at')
+          .eq('member_id', currentMember.id)
+          .order('created_at', { ascending: false });
+        
+        if (!contributionsError && contributions) {
+          const totalContributions = contributions.reduce((sum, c) => sum + parseFloat(c.amount || 0), 0);
+          document.getElementById('totalMemberContributions').textContent = totalContributions.toLocaleString();
+          
+          // This year's contributions
+          const currentYear = new Date().getFullYear();
+          const yearlyContributions = contributions
+            .filter(c => c.contribution_year === currentYear)
+            .reduce((sum, c) => sum + parseFloat(c.amount || 0), 0);
+          
+          document.getElementById('yearContributions').textContent = yearlyContributions.toLocaleString();
+          
+          // Recent contributions table
+          const recentTable = document.getElementById('recentContributionsTable');
+          if (recentTable) {
+            recentTable.innerHTML = contributions.slice(0, 5).map(contribution => `
+              <tr>
+                <td>${new Date(contribution.created_at).toLocaleDateString()}</td>
+                <td>${getMonthName(contribution.contribution_month)} ${contribution.contribution_year}</td>
+                <td>Ksh ${parseFloat(contribution.amount).toLocaleString()}</td>
+                <td>M-Pesa</td>
+                <td><span class="member-status-badge status-paid">Paid</span></td>
+                <td>
+                  <button class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-receipt"></i>
+                  </button>
+                </td>
+              </tr>
+            `).join('');
+          }
+        }
+        
+        // Load active loans
+        const { data: loans, error: loansError } = await supabase
+          .from('loans')
+          .select('id, principal_amount, status')
+          .eq('member_id', currentMember.id)
+          .eq('status', 'approved');
+        
+        if (!loansError && loans) {
+          const totalActiveLoans = loans.reduce((sum, loan) => sum + parseFloat(loan.principal_amount || 0), 0);
+          document.getElementById('memberActiveLoans').textContent = totalActiveLoans.toLocaleString();
+          document.getElementById('loansCount').textContent = loans.length;
+          document.getElementById('activeLoansCount').textContent = loans.length;
+        }
+        
+        // Load pending contributions
+        const currentMonth = new Date().getMonth() + 1;
+        const currentYear = new Date().getFullYear();
+        
+        const { data: currentMonthContribution, error: monthError } = await supabase
+          .from('contributions')
+          .select('amount')
+          .eq('member_id', currentMember.id)
+          .eq('contribution_month', currentMonth)
+          .eq('contribution_year', currentYear)
+          .single();
+        
+        if (!monthError && currentMonthContribution) {
+          const monthlyAmount = parseFloat(currentMonthContribution.amount || 0);
+          const progress = Math.min((monthlyAmount / 5000) * 100, 100); // Assuming 5000 target
+          
+          document.getElementById('monthlyProgress').textContent = `${progress.toFixed(0)}%`;
+          document.getElementById('monthlyProgressBar').style.width = `${progress}%`;
+        }
+        
+        // Load upcoming meetings
+        const { data: meetings, error: meetingsError } = await supabase
+          .from('meetings')
+          .select('meeting_date, agenda')
+          .gte('meeting_date', new Date().toISOString().split('T')[0])
+          .order('meeting_date', { ascending: true })
+          .limit(1);
+        
+        if (!meetingsError && meetings && meetings.length > 0) {
+          const nextMeeting = meetings[0];
+          document.getElementById('nextMeetingDate').textContent = new Date(nextMeeting.meeting_date).toLocaleDateString();
+          document.getElementById('nextMeetingTime').textContent = nextMeeting.agenda?.substring(0, 50) || 'Meeting scheduled';
+        }
+        
+        // Load upcoming deadlines
+        await loadUpcomingDeadlines();
+        
+      } catch (error) {
+        console.error('Error loading member dashboard data:', error);
+        throw error;
+      }
+    }
+    
+    // Load Member Contributions Data
+    async function loadMemberContributionsData() {
+      try {
+        if (!currentMember) return;
+        
+        const { data: contributions, error } = await supabase
+          .from('contributions')
+          .select('*')
+          .eq('member_id', currentMember.id)
+          .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        
+        // Update summary cards
+        const totalPaid = contributions.reduce((sum, c) => sum + parseFloat(c.amount || 0), 0);
+        document.getElementById('totalPaidAmount').textContent = totalPaid.toLocaleString();
+        
+        const currentYear = new Date().getFullYear();
+        const yearlyTotal = contributions
+          .filter(c => c.contribution_year === currentYear)
+          .reduce((sum, c) => sum + parseFloat(c.amount || 0), 0);
+        
+        document.getElementById('yearlyContributions').textContent = yearlyTotal.toLocaleString();
+        
+        const currentMonth = new Date().getMonth() + 1;
+        const monthlyTotal = contributions
+          .filter(c => c.contribution_month === currentMonth && c.contribution_year === currentYear)
+          .reduce((sum, c) => sum + parseFloat(c.amount || 0), 0);
+        
+        document.getElementById('monthlyContributions').textContent = monthlyTotal.toLocaleString();
+        document.getElementById('currentMonth').textContent = getMonthName(currentMonth);
+        
+        // Populate contributions table
+        const tableBody = document.getElementById('contributionsHistoryTable');
+        if (tableBody) {
+          tableBody.innerHTML = contributions.map(contribution => `
+            <tr>
+              <td>${new Date(contribution.created_at).toLocaleDateString()}</td>
+              <td>${getMonthName(contribution.contribution_month)} ${contribution.contribution_year}</td>
+              <td>Ksh ${parseFloat(contribution.amount).toLocaleString()}</td>
+              <td>${contribution.payment_method || 'N/A'}</td>
+              <td><span class="member-status-badge status-paid">Paid</span></td>
+              <td>#${contribution.id.toString().padStart(6, '0')}</td>
+              <td>
+                <button class="btn btn-sm btn-outline-primary" onclick="viewContribution(${contribution.id})">
+                  <i class="fas fa-eye"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-success" onclick="downloadReceipt(${contribution.id})">
+                  <i class="fas fa-download"></i>
+                </button>
+              </td>
+            </tr>
+          `).join('');
+        }
+        
+        // Initialize contribution chart
+        initializeContributionChart(contributions);
+        
+        // Populate year filter
+        const yearFilter = document.getElementById('contributionYearFilter');
+        if (yearFilter) {
+          const years = [...new Set(contributions.map(c => c.contribution_year))].sort((a, b) => b - a);
+          yearFilter.innerHTML = '<option value="">All Years</option>' + 
+            years.map(year => `<option value="${year}">${year}</option>`).join('');
+        }
+        
+      } catch (error) {
+        console.error('Error loading contributions:', error);
+        showMemberError('Failed to load contributions');
+      }
+    }
+    
+    // Load Member Loans Data
+    async function loadMemberLoansData() {
+      try {
+        if (!currentMember) return;
+        
+        const { data: loans, error } = await supabase
+          .from('loans')
+          .select(`
+            *,
+            repayments (amount_paid, payment_date),
+            repayment_schedules (*)
+          `)
+          .eq('member_id', currentMember.id)
+          .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        
+        // Update loan summary section
+        const summarySection = document.getElementById('loanSummarySection');
+        if (summarySection) {
+          const activeLoans = loans.filter(loan => loan.status === 'approved');
+          const pendingLoans = loans.filter(loan => loan.status === 'pending');
+          const totalBorrowed = loans.reduce((sum, loan) => sum + parseFloat(loan.principal_amount || 0), 0);
+          const totalRepaid = loans.reduce((sum, loan) => {
+            const loanRepayments = loan.repayments || [];
+            return sum + loanRepayments.reduce((sum2, repayment) => sum2 + parseFloat(repayment.amount_paid || 0), 0);
+          }, 0);
+          
+          summarySection.innerHTML = `
+            <div class="row">
+              <div class="col-md-3">
+                <div class="member-card">
+                  <h5 class="member-card-title">Active Loans</h5>
+                  <div class="member-card-value">${activeLoans.length}</div>
+                  <p class="member-card-subtext">Currently active</p>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="member-card">
+                  <h5 class="member-card-title">Total Borrowed</h5>
+                  <div class="member-card-value">Ksh ${totalBorrowed.toLocaleString()}</div>
+                  <p class="member-card-subtext">All time</p>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="member-card">
+                  <h5 class="member-card-title">Total Repaid</h5>
+                  <div class="member-card-value">Ksh ${totalRepaid.toLocaleString()}</div>
+                  <p class="member-card-subtext">Amount paid back</p>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="member-card">
+                  <h5 class="member-card-title">Pending</h5>
+                  <div class="member-card-value">${pendingLoans.length}</div>
+                  <p class="member-card-subtext">Awaiting approval</p>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+        
+        // Update loan applications list
+        const applicationsList = document.getElementById('loanApplicationsList');
+        if (applicationsList) {
+          applicationsList.innerHTML = loans.map(loan => `
+            <div class="loan-card">
+              <div class="loan-card-header">
+                <h5 class="loan-title">Loan #${loan.id.toString().padStart(4, '0')}</h5>
+                <span class="member-status-badge ${getLoanStatusClass(loan.status)}">
+                  ${loan.status}
+                </span>
+              </div>
+              
+              <div class="loan-details">
+                <div class="detail-item">
+                  <span class="detail-label">Principal Amount</span>
+                  <span class="detail-value">Ksh ${parseFloat(loan.principal_amount).toLocaleString()}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Interest Rate</span>
+                  <span class="detail-value">${loan.interest_rate}%</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Total Payable</span>
+                  <span class="detail-value">Ksh ${parseFloat(loan.total_payable || loan.principal_amount).toLocaleString()}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Applied Date</span>
+                  <span class="detail-value">${new Date(loan.created_at).toLocaleDateString()}</span>
+                </div>
+              </div>
+              
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  ${loan.status === 'approved' ? `
+                    <button class="btn btn-sm btn-primary" onclick="viewRepaymentSchedule(${loan.id})">
+                      <i class="fas fa-calendar me-1"></i> View Schedule
+                    </button>
+                    <button class="btn btn-sm btn-success ms-2" onclick="makeRepayment(${loan.id})">
+                      <i class="fas fa-money-bill-wave me-1"></i> Make Payment
+                    </button>
+                  ` : ''}
+                  
+                  ${loan.status === 'pending' ? `
+                    <button class="btn btn-sm btn-warning" onclick="editLoanApplication(${loan.id})">
+                      <i class="fas fa-edit me-1"></i> Edit Application
+                    </button>
+                  ` : ''}
+                </div>
+                
+                <button class="btn btn-sm btn-outline-info" onclick="viewLoanDetails(${loan.id})">
+                  <i class="fas fa-info-circle me-1"></i> Details
+                </button>
+              </div>
+            </div>
+          `).join('');
+        }
+        
+      } catch (error) {
+        console.error('Error loading loans:', error);
+        showMemberError('Failed to load loan data');
+      }
+    }
+    
+    // Load Member Repayments Data
+    async function loadMemberRepaymentsData() {
+      try {
+        if (!currentMember) return;
+        
+        // Load active loans with repayment schedules
+        const { data: activeLoans, error: loansError } = await supabase
+          .from('loans')
+          .select(`
+            id,
+            principal_amount,
+            repayment_schedules (*),
+            repayments (*)
+          `)
+          .eq('member_id', currentMember.id)
+          .eq('status', 'approved');
+        
+        if (loansError) throw loansError;
+        
+        // Update active loan repayments section
+        const repaymentsSection = document.getElementById('activeLoanRepayments');
+        if (repaymentsSection) {
+          repaymentsSection.innerHTML = activeLoans.map(loan => `
+            <div class="loan-card mb-3">
+              <div class="loan-card-header">
+                <h5 class="loan-title">Loan #${loan.id.toString().padStart(4, '0')} Repayments</h5>
+                <span class="badge bg-primary">Ksh ${parseFloat(loan.principal_amount).toLocaleString()}</span>
+              </div>
+              
+              <div class="mt-3">
+                <h6>Upcoming Payments</h6>
+                ${loan.repayment_schedules && loan.repayment_schedules.length > 0 ? 
+                  loan.repayment_schedules
+                    .filter(schedule => !schedule.is_paid)
+                    .sort((a, b) => new Date(a.due_date) - new Date(b.due_date))
+                    .slice(0, 3)
+                    .map(schedule => `
+                      <div class="repayment-item">
+                        <div class="repayment-date">${new Date(schedule.due_date).toLocaleDateString()}</div>
+                        <div class="repayment-amount">Ksh ${parseFloat(schedule.expected_amount).toLocaleString()}</div>
+                        <div class="repayment-status">
+                          <span class="member-status-badge status-pending">Pending</span>
+                        </div>
+                        <button class="btn btn-sm btn-success" onclick="payNow(${schedule.id})">
+                          Pay Now
+                        </button>
+                      </div>
+                    `).join('') :
+                  '<p class="text-muted">No repayment schedule found.</p>'
+                }
+              </div>
+            </div>
+          `).join('');
+        }
+        
+        // Load repayment history
+        const { data: repayments, error: repaymentsError } = await supabase
+          .from('repayments')
+          .select(`
+            *,
+            loans (id)
+          `)
+          .eq('member_id', currentMember.id)
+          .order('payment_date', { ascending: false });
+        
+        if (!repaymentsError && repayments) {
+          const historyTable = document.querySelector('#repaymentHistoryTable tbody');
+          if (historyTable) {
+            historyTable.innerHTML = repayments.map(repayment => `
+              <tr>
+                <td>${new Date(repayment.payment_date).toLocaleDateString()}</td>
+                <td>Loan #${repayment.loans?.id.toString().padStart(4, '0') || 'N/A'}</td>
+                <td>Ksh ${parseFloat(repayment.amount_paid).toLocaleString()}</td>
+                <td>${repayment.payment_method || 'N/A'}</td>
+                <td><span class="member-status-badge status-paid">Paid</span></td>
+                <td>
+                  <button class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-receipt"></i>
+                  </button>
+                </td>
+              </tr>
+            `).join('');
+          }
+        }
+        
+      } catch (error) {
+        console.error('Error loading repayments:', error);
+        showMemberError('Failed to load repayment data');
+      }
+    }
+    
+    // Load Member Statements Data
+    async function loadMemberStatementsData() {
+      // This would generate statements based on contributions and loans
+      const statementPreview = document.getElementById('statementPreview');
+      if (statementPreview) {
+        statementPreview.innerHTML = `
+          <div class="statement-card">
+            <div class="statement-period">
+              <span>Statement for: January 2024</span>
+              <button class="btn btn-sm btn-primary">
+                <i class="fas fa-download me-1"></i> Download PDF
+              </button>
+            </div>
+            
+            <div class="statement-summary">
+              <div class="summary-item">
+                <div class="summary-label">Opening Balance</div>
+                <div class="summary-value">Ksh 45,000</div>
+              </div>
+              <div class="summary-item">
+                <div class="summary-label">Contributions</div>
+                <div class="summary-value">Ksh 5,000</div>
+              </div>
+              <div class="summary-item">
+                <div class="summary-label">Loan Repayments</div>
+                <div class="summary-value">Ksh 2,500</div>
+              </div>
+              <div class="summary-item">
+                <div class="summary-label">Closing Balance</div>
+                <div class="summary-value">Ksh 47,500</div>
+              </div>
+            </div>
+            
+            <div class="mt-3">
+              <h6>Transaction Details</h6>
+              <div class="table-responsive">
+                <table class="table table-sm">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Description</th>
+                      <th>Debit</th>
+                      <th>Credit</th>
+                      <th>Balance</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>01/01/2024</td>
+                      <td>Monthly Contribution</td>
+                      <td>-</td>
+                      <td>5,000</td>
+                      <td>50,000</td>
+                    </tr>
+                    <tr>
+                      <td>15/01/2024</td>
+                      <td>Loan Repayment</td>
+                      <td>2,500</td>
+                      <td>-</td>
+                      <td>47,500</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    }
+    
+    // Load Member Profile Data
+    async function loadMemberProfileData() {
+      if (!currentMember) return;
+      
+      // Populate profile form
+      document.getElementById('profileFullName').value = currentMember.full_name;
+      document.getElementById('profileEmail').value = currentMember.email;
+      document.getElementById('profilePhone').value = currentMember.phone || '';
+      
+      // Add other profile fields as needed
+    }
+    
+    // Load Member Notifications
+    async function loadMemberNotifications() {
+      try {
+        if (!currentMember) return;
+        
+        const { data: notifications, error } = await supabase
+          .from('announcements')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(20);
+        
+        if (error) throw error;
+        
+        const notificationsList = document.getElementById('notificationsList');
+        if (notificationsList) {
+          notificationsList.innerHTML = notifications.map(notification => `
+            <div class="member-card mb-3">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <h5 class="mb-1">${notification.title}</h5>
+                  <p class="text-muted mb-2">${notification.message}</p>
+                  <small class="text-muted">
+                    <i class="fas fa-clock me-1"></i>
+                    ${new Date(notification.created_at).toLocaleString()}
+                  </small>
+                </div>
+                <span class="badge bg-info">New</span>
+              </div>
+            </div>
+          `).join('');
+        }
+        
+      } catch (error) {
+        console.error('Error loading notifications:', error);
+      }
+    }
+    
+    // Helper Functions
+    function getMonthName(monthNumber) {
+      const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                     'July', 'August', 'September', 'October', 'November', 'December'];
+      return months[monthNumber - 1] || 'Unknown';
+    }
+    
+    function getLoanStatusClass(status) {
+      switch(status) {
+        case 'approved': return 'status-approved';
+        case 'pending': return 'status-pending';
+        case 'rejected': return 'status-overdue';
+        case 'completed': return 'status-paid';
+        default: return '';
+      }
+    }
+    
+    async function loadUpcomingDeadlines() {
+      const deadlinesContainer = document.getElementById('upcomingDeadlines');
+      if (deadlinesContainer) {
+        deadlinesContainer.innerHTML = `
+          <div class="alert alert-warning p-2 mb-2">
+            <small><i class="fas fa-exclamation-circle me-1"></i> Contribution due: 25th Feb</small>
+          </div>
+          <div class="alert alert-info p-2">
+            <small><i class="fas fa-calendar me-1"></i> Next meeting: 28th Feb</small>
+          </div>
+        `;
+      }
+    }
+    
+    function initializeContributionChart(contributions) {
+      const ctx = document.getElementById('contributionChart');
+      if (!ctx) return;
+      
+      // Group contributions by month
+      const monthlyData = {};
+      contributions.forEach(contribution => {
+        const key = `${contribution.contribution_year}-${contribution.contribution_month}`;
+        if (!monthlyData[key]) {
+          monthlyData[key] = 0;
+        }
+        monthlyData[key] += parseFloat(contribution.amount);
+      });
+      
+      const labels = Object.keys(monthlyData).sort().slice(-6);
+      const data = labels.map(label => monthlyData[label]);
+      
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels.map(label => {
+            const [year, month] = label.split('-');
+            return `${getMonthName(parseInt(month))} ${year}`;
+          }),
+          datasets: [{
+            label: 'Contributions (Ksh)',
+            data: data,
+            backgroundColor: 'rgba(67, 97, 238, 0.5)',
+            borderColor: 'rgba(67, 97, 238, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return 'Ksh ' + value.toLocaleString();
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+    
+    function initializeMemberDashboard() {
+      // Initialize any dashboard-specific functionality
+      console.log('Member dashboard initialized');
+    }
+    
+    // Setup Event Listeners
+    function setupMemberEventListeners() {
+      // Sidebar toggle
+      if (memberSidebarToggle) {
+        memberSidebarToggle.addEventListener('click', () => {
+          memberSidebar.classList.toggle('collapsed');
+          const icon = memberSidebarToggle.querySelector('i');
+          icon.classList.toggle('fa-chevron-left');
+          icon.classList.toggle('fa-chevron-right');
+        });
+      }
+      
+      // Mobile menu toggle
+      if (memberMobileMenuBtn) {
+        memberMobileMenuBtn.addEventListener('click', () => {
+          memberSidebar.classList.toggle('mobile-open');
+        });
+      }
+      
+      // Menu item clicks
+      memberMenuItems.forEach(item => {
+        item.addEventListener('click', async (e) => {
+          e.preventDefault();
+          const page = item.getAttribute('data-page');
+          if (page) {
+            await switchPage(page);
+          }
+        });
+      });
+      
+      // Quick action buttons
+      document.getElementById('quickContributionBtn')?.addEventListener('click', () => {
+        const modal = new bootstrap.Modal(document.getElementById('makeContributionModal'));
+        modal.show();
+      });
+      
+      document.getElementById('quickLoanApplicationBtn')?.addEventListener('click', () => {
+        const modal = new bootstrap.Modal(document.getElementById('applyLoanModal'));
+        modal.show();
+      });
+      
+      document.getElementById('applyNewLoanBtn')?.addEventListener('click', () => {
+        const modal = new bootstrap.Modal(document.getElementById('applyLoanModal'));
+        modal.show();
+      });
+      
+      document.getElementById('addContributionBtn')?.addEventListener('click', () => {
+        const modal = new bootstrap.Modal(document.getElementById('makeContributionModal'));
+        modal.show();
+      });
+      
+      // Logout button
+      document.getElementById('memberLogoutBtn')?.addEventListener('click', logoutMember);
+      
+      // Close mobile menu when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!memberSidebar.contains(e.target) && !memberMobileMenuBtn.contains(e.target)) {
+          memberSidebar.classList.remove('mobile-open');
+        }
+      });
+      
+      // Make contribution form submission
+      document.getElementById('submitContributionBtn')?.addEventListener('click', async () => {
+        await submitContribution();
+      });
+    }
+    
+    // Action Functions
+    async function submitContribution() {
+      try {
+        if (!currentMember) return;
+        
+        const amount = document.getElementById('contributionAmount').value;
+        const month = document.getElementById('contributionMonth').value;
+        const year = document.getElementById('contributionYear').value;
+        const method = document.getElementById('paymentMethod').value;
+        const reference = document.getElementById('transactionRef').value;
+        
+        if (!amount || !month || !year || !method) {
+          showMemberError('Please fill all required fields');
+          return;
+        }
+        
+        const { error } = await supabase
+          .from('contributions')
+          .insert({
+            member_id: currentMember.id,
+            amount: parseFloat(amount),
+            contribution_month: parseInt(month),
+            contribution_year: parseInt(year),
+            payment_method: method,
+            transaction_reference: reference
+          });
+        
+        if (error) throw error;
+        
+        showMemberSuccess('Contribution recorded successfully!');
+        
+        // Close modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('makeContributionModal'));
+        modal.hide();
+        
+        // Refresh data
+        await loadMemberDashboardData();
+        await loadMemberContributionsData();
+        
+      } catch (error) {
+        console.error('Error submitting contribution:', error);
+        showMemberError('Failed to record contribution');
+      }
+    }
+    
+    window.viewContribution = async (contributionId) => {
+      // Implement view contribution details
+      alert(`Viewing contribution #${contributionId}`);
+    };
+    
+    window.downloadReceipt = async (contributionId) => {
+      // Implement receipt download
+      alert(`Downloading receipt for contribution #${contributionId}`);
+    };
+    
+    window.viewRepaymentSchedule = async (loanId) => {
+      await switchPage('repayments');
+      // Scroll to specific loan schedule
+    };
+    
+    window.makeRepayment = async (loanId) => {
+      // Implement make repayment functionality
+      alert(`Making repayment for loan #${loanId}`);
+    };
+    
+    window.viewLoanDetails = async (loanId) => {
+      // Implement view loan details
+      alert(`Viewing loan #${loanId} details`);
+    };
+    
+    window.editLoanApplication = async (loanId) => {
+      // Implement edit loan application
+      alert(`Editing loan application #${loanId}`);
+    };
+    
+    window.payNow = async (scheduleId) => {
+      // Implement immediate payment
+      alert(`Paying schedule #${scheduleId}`);
+    };
+    
+    // Show Success Message
+    function showMemberSuccess(message) {
+      // You can implement a toast notification
+      alert(message); // Temporary
+    }
+    
+    // Show Error Message
+    function showMemberError(message) {
+      // You can implement a toast notification
+      alert(message); // Temporary
+    }
+    
+    // Logout Function
+    async function logoutMember() {
+      try {
+        await supabase.auth.signOut();
+        window.location.href = 'login.html';
+      } catch (error) {
+        console.error('Error logging out:', error);
+        showMemberError('Logout failed. Please try again.');
+      }
+    }
+    
+    // Make functions available globally
+    window.switchPage = switchPage;
+    window.logoutMember = logoutMember;
+    
+  </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+/* Dashboard specific styles */
+#wrapper {
+    overflow-x: hidden;
+}
+
+#sidebar-container {
+    min-height: 100vh;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+}
+
+.list-group-item {
+    border: none;
+    padding: 12px 20px;
+}
+
+.list-group-item.active {
+    background-color: #198754;
+    border-color: #198754;
+}

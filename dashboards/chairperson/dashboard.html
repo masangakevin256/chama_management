@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chairperson Dashboard | Chama Management Suite</title>
+  
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="chairperson-dashboard.css">
+</head>
+<body>
+  <!-- Dashboard Container -->
+  <div class="dashboard-container">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h3><i class="fas fa-crown"></i> <span class="menu-text">ChamaSuite</span></h3>
+        <button class="sidebar-toggle" id="sidebarToggle">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+      </div>
+      
+      <!-- User Info -->
+      <div class="user-info">
+        <div class="user-avatar">
+          <i class="fas fa-user-tie"></i>
+        </div>
+        <div class="user-name" id="userName">John Chairperson</div>
+        <div class="user-role">Chairperson</div>
+      </div>
+      
+      <!-- Sidebar Menu -->
+      <nav class="sidebar-menu">
+        <a href="#dashboard" class="menu-item active" data-page="dashboard">
+          <i class="fas fa-tachometer-alt"></i>
+          <span class="menu-text">Dashboard</span>
+        </a>
+        
+        <a href="#members" class="menu-item" data-page="members">
+          <i class="fas fa-users"></i>
+          <span class="menu-text">All Members</span>
+          <span class="menu-badge" id="memberCount">42</span>
+        </a>
+        
+        <a href="#contributions" class="menu-item" data-page="contributions">
+          <i class="fas fa-hand-holding-usd"></i>
+          <span class="menu-text">Contributions</span>
+        </a>
+        
+        <a href="#loans" class="menu-item" data-page="loans">
+          <i class="fas fa-landmark"></i>
+          <span class="menu-text">Loan Approvals</span>
+          <span class="menu-badge" id="pendingLoans">5</span>
+        </a>
+        
+        <a href="#repayments" class="menu-item" data-page="repayments">
+          <i class="fas fa-money-check-alt"></i>
+          <span class="menu-text">Repayments</span>
+        </a>
+        
+        <a href="#shareouts" class="menu-item" data-page="shareouts">
+          <i class="fas fa-share-alt"></i>
+          <span class="menu-text">Share-outs</span>
+          <span class="menu-badge" id="pendingShareouts">2</span>
+        </a>
+        
+        <a href="#meetings" class="menu-item" data-page="meetings">
+          <i class="fas fa-calendar-alt"></i>
+          <span class="menu-text">Meetings</span>
+        </a>
+        
+        <a href="#financials" class="menu-item" data-page="financials">
+          <i class="fas fa-chart-line"></i>
+          <span class="menu-text">Financial Summary</span>
+        </a>
+        
+        <a href="#reports" class="menu-item" data-page="reports">
+          <i class="fas fa-file-alt"></i>
+          <span class="menu-text">Reports</span>
+        </a>
+        
+        <a href="#communications" class="menu-item" data-page="communications">
+          <i class="fas fa-bullhorn"></i>
+          <span class="menu-text">Communications</span>
+        </a>
+        
+        <div class="mt-4">
+          <a href="#settings" class="menu-item" data-page="settings">
+            <i class="fas fa-cog"></i>
+            <span class="menu-text">Settings</span>
+          </a>
+          
+          <a href="#" class="menu-item" id="logoutBtn">
+            <i class="fas fa-sign-out-alt"></i>
+            <span class="menu-text">Logout</span>
+          </a>
+        </div>
+      </nav>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Header -->
+      <header class="header">
+        <div class="header-left">
+          <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <i class="fas fa-bars"></i>
+          </button>
+          <h1 id="pageTitle">Dashboard Overview</h1>
+          <p id="pageSubtitle">Welcome back, Chairperson</p>
+        </div>
+        
+        <div class="header-right">
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="globalSearch" placeholder="Search members, loans, reports...">
+          </div>
+          
+          <button class="notification-btn" id="notificationBtn">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge">3</span>
+          </button>
+          
+          <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown">
+              <i class="fas fa-user-circle me-2"></i>
+              <span id="currentUserName">John C.</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>My Profile</a></li>
+              <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#" id="logoutDropdown"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      
+      <!-- Content Area -->
+      <div class="content">
+        
+        <!-- Dashboard Page (Default) -->
+        <div id="dashboardPage" class="page-content">
+          <!-- Dashboard Cards -->
+          <div class="dashboard-cards">
+            <div class="dashboard-card">
+              <div class="card-header">
+                <div class="card-icon">
+                  <i class="fas fa-users"></i>
+                </div>
+                <div class="card-change positive">
+                  <i class="fas fa-arrow-up"></i> 12%
+                </div>
+              </div>
+              <h3 class="card-title">Total Members</h3>
+              <div class="card-value" id="totalMembers">42</div>
+              <p class="text-muted mt-2">Active: <span id="activeMembers">38</span></p>
+            </div>
+            
+            <div class="dashboard-card">
+              <div class="card-header">
+                <div class="card-icon" style="background: linear-gradient(135deg, #20c997, #28a745);">
+                  <i class="fas fa-hand-holding-usd"></i>
+                </div>
+                <div class="card-change positive">
+                  <i class="fas fa-arrow-up"></i> 8%
+                </div>
+              </div>
+              <h3 class="card-title">Total Contributions</h3>
+              <div class="card-value">Ksh <span id="totalContributions">1,245,800</span></div>
+              <p class="text-muted mt-2">This month: Ksh <span id="monthContributions">85,200</span></p>
+            </div>
+            
+            <div class="dashboard-card">
+              <div class="card-header">
+                <div class="card-icon" style="background: linear-gradient(135deg, #ff7e5f, #feb47b);">
+                  <i class="fas fa-landmark"></i>
+                </div>
+                <div class="card-change negative">
+                  <i class="fas fa-arrow-down"></i> 5%
+                </div>
+              </div>
+              <h3 class="card-title">Active Loans</h3>
+              <div class="card-value">Ksh <span id="activeLoans">450,000</span></div>
+              <p class="text-muted mt-2">Pending approvals: <span id="pendingApprovals">5</span></p>
+            </div>
+            
+            <div class="dashboard-card">
+              <div class="card-header">
+                <div class="card-icon" style="background: linear-gradient(135deg, #6f42c1, #a370f7);">
+                  <i class="fas fa-chart-pie"></i>
+                </div>
+                <div class="card-change positive">
+                  <i class="fas fa-arrow-up"></i> 15%
+                </div>
+              </div>
+              <h3 class="card-title">Chama Balance</h3>
+              <div class="card-value">Ksh <span id="chamaBalance">2,150,450</span></div>
+              <p class="text-muted mt-2">Available for loans</p>
+            </div>
+          </div>
+          
+          <!-- Charts Row -->
+          <div class="row">
+            <div class="col-lg-8">
+              <div class="chart-container">
+                <div class="chart-header">
+                  <h3 class="chart-title">Monthly Contributions Trend</h3>
+                  <select class="form-select form-select-sm" style="width: auto;" id="chartPeriod">
+                    <option>Last 6 months</option>
+                    <option>Last year</option>
+                    <option>All time</option>
+                  </select>
+                </div>
+                <canvas id="contributionsChart"></canvas>
+              </div>
+            </div>
+            
+            <div class="col-lg-4">
+              <div class="chart-container">
+                <div class="chart-header">
+                  <h3 class="chart-title">Member Status</h3>
+                </div>
+                <canvas id="membersChart"></canvas>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Pending Actions -->
+          <div class="table-container mt-4">
+            <div class="table-header">
+              <h3><i class="fas fa-clock me-2"></i>Pending Actions Requiring Approval</h3>
+              <div class="table-actions">
+                <button class="btn btn-sm btn-primary" id="approveAllBtn">
+                  <i class="fas fa-check-circle me-1"></i> Approve All
+                </button>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Member</th>
+                    <th>Details</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="pendingActionsTable">
+                  <!-- Filled by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Members Page -->
+        <div id="membersPage" class="page-content d-none">
+          <div class="table-container">
+            <div class="table-header">
+              <h3><i class="fas fa-users me-2"></i>All Members</h3>
+              <div class="table-actions">
+                <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addMemberModal">
+                  <i class="fas fa-plus me-1"></i> Add Member
+                </button>
+                <button class="btn btn-sm btn-outline-secondary" id="exportMembersBtn">
+                  <i class="fas fa-download me-1"></i> Export
+                </button>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-hover" id="membersTable">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Join Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Filled by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Contributions Page -->
+        <div id="contributionsPage" class="page-content d-none">
+          <!-- Similar structure for contributions -->
+          <div class="text-center empty-state">
+            <i class="fas fa-hand-holding-usd"></i>
+            <h4>Contributions Management</h4>
+            <p>View and manage all member contributions</p>
+          </div>
+        </div>
+        
+        <!-- Loans Page -->
+        <div id="loansPage" class="page-content d-none">
+          <!-- Similar structure for loans -->
+          <div class="text-center empty-state">
+            <i class="fas fa-landmark"></i>
+            <h4>Loan Approvals</h4>
+            <p>Approve or reject loan applications</p>
+          </div>
+        </div>
+        
+        <!-- Add more pages for other sections -->
+        
+      </div>
+    </main>
+  </div>
+  
+  <!-- Modals -->
+  
+  <!-- Add Member Modal -->
+  <div class="modal fade" id="addMemberModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fas fa-user-plus me-2"></i>Add New Member</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="addMemberForm">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Full Name *</label>
+                <input type="text" class="form-control" name="full_name" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Email *</label>
+                <input type="email" class="form-control" name="email" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Password *</label>
+                <input type="password" class="form-control" name="password" required minlength="6">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Phone</label>
+                <input type="tel" class="form-control" name="phone">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Role *</label>
+                <select class="form-select" name="role" required>
+                  <option value="">Select Role</option>
+                  <option value="member">Member</option>
+                  <option value="treasurer">Treasurer</option>
+                  <option value="secretary">Secretary</option>
+                  <option value="chairperson">Chairperson</option>
+                </select>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Membership Number</label>
+                <input type="text" class="form-control" name="membership_no">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Initial Status</label>
+                <select class="form-select" name="status">
+                  <option value="active">Active</option>
+                  <option value="pending">Pending</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="saveMemberBtn">Save Member</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Edit Member Modal -->
+  <div class="modal fade" id="editMemberModal" tabindex="-1">
+    <!-- Similar to add modal but for editing -->
+  </div>
+  
+  <!-- Delete Confirmation Modal -->
+  <div class="modal fade" id="deleteConfirmModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fas fa-exclamation-triangle text-warning me-2"></i>Confirm Delete</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete this member? This action cannot be undone.</p>
+          <p class="text-muted small">Member: <span id="deleteMemberName"></span></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Custom JavaScript -->
+  <script type="module">
+    // Custom JavaScript for Chairperson Dashboard
+import supabase from "../../supabase/supabase.js";
+import ENV from "../../env.js";
+
+// Global state
+let currentUser = null;
+let currentPage = 'dashboard';
+
+// DOM Elements
+const sidebar = document.getElementById('sidebar');
+const sidebarToggle = document.getElementById('sidebarToggle');
+const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+const menuItems = document.querySelectorAll('.menu-item');
+const pageContents = document.querySelectorAll('.page-content');
+const pageTitle = document.getElementById('pageTitle');
+const pageSubtitle = document.getElementById('pageSubtitle');
+
+// Initialize Dashboard
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        // Check authentication
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        if (authError || !user) {
+            window.location.href = '../../index.html';
+            return;
+        }
+
+        // Load user data
+        await loadUserData(user);
+        
+        // Load initial page data
+        await switchPage('dashboard');
+        
+        // Setup event listeners
+        setupEventListeners();
+        
+    } catch (error) {
+        console.error('Initialization error:', error);
+        alert('Error loading dashboard. Please try again.');
+    }
+});
+
+// Load User Data
+async function loadUserData(user) {
+    try {
+        const { data: profile, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+        
+        if (error) throw error;
+        
+        if (!profile) {
+            await supabase.auth.signOut();
+            window.location.href = '../../index.html';
+            return;
+        }
+        
+        // Check if user is chairperson
+        if (profile.role !== 'chairperson') {
+            alert('Access denied. Chairperson only.');
+            window.location.href = `dashboards/${profile.role}/dashboard.html`;
+            return;
+        }
+        
+        currentUser = profile;
+        
+        // Update UI with user info
+        document.getElementById('userName').textContent = profile.full_name;
+        document.getElementById('currentUserName').textContent = profile.full_name.split(' ')[0];
+        
+    } catch (error) {
+        console.error('Error loading user data:', error);
+        throw error;
+    }
+}
+
+// Switch Page Function
+async function switchPage(page) {
+    currentPage = page;
+    
+    // Hide all pages
+    pageContents.forEach(p => p.classList.add('d-none'));
+    
+    // Show selected page
+    const pageElement = document.getElementById(`${page}Page`);
+    if (!pageElement) {
+        console.error(`Page ${page} not found`);
+        return;
+    }
+    
+    pageElement.classList.remove('d-none');
+    
+    // Update page title and subtitle
+    updatePageTitle(page);
+    
+    // Load page-specific data
+    await loadPageData(page);
+    
+    // Update active menu item
+    updateActiveMenuItem(page);
+}
+
+// Update Page Title
+function updatePageTitle(page) {
+    const pageTitles = {
+        dashboard: { title: 'Dashboard Overview', subtitle: 'Welcome back, Chairperson' },
+        members: { title: 'All Members', subtitle: 'Manage all chama members' },
+        contributions: { title: 'Contributions', subtitle: 'View and manage contributions' },
+        loans: { title: 'Loan Approvals', subtitle: 'Approve or reject loan applications' },
+        repayments: { title: 'Repayments', subtitle: 'Track loan repayments' },
+        shareouts: { title: 'Share-outs', subtitle: 'Review and approve share-outs' },
+        meetings: { title: 'Meetings', subtitle: 'View and manage meetings' },
+        financials: { title: 'Financial Summary', subtitle: 'Complete financial overview' },
+        reports: { title: 'Reports', subtitle: 'Generate and view reports' },
+        communications: { title: 'Communications', subtitle: 'Send announcements and messages' },
+        settings: { title: 'Settings', subtitle: 'System settings and preferences' }
+    };
+    
+    const pageInfo = pageTitles[page] || { title: page.charAt(0).toUpperCase() + page.slice(1), subtitle: '' };
+    
+    pageTitle.textContent = pageInfo.title;
+    pageSubtitle.textContent = pageInfo.subtitle;
+}
+
+// Update Active Menu Item
+function updateActiveMenuItem(page) {
+    menuItems.forEach(item => {
+        item.classList.remove('active');
+        if (item.getAttribute('data-page') === page) {
+            item.classList.add('active');
+        }
+    });
+}
+
+// Load Page Data
+async function loadPageData(page) {
+    try {
+        switch(page) {
+            case 'dashboard':
+                await loadDashboardData();
+                break;
+            case 'members':
+                await loadMembersData();
+                break;
+            case 'loans':
+                await loadLoansData();
+                break;
+            case 'shareouts':
+                await loadShareoutsData();
+                break;
+            case 'contributions':
+                await loadContributionsData();
+                break;
+            case 'financials':
+                await loadFinancialSummary();
+                break;
+            case 'meetings':
+                await loadMeetingsData();
+                break;
+            case 'reports':
+                await loadReportsData();
+                break;
+            case 'communications':
+                await loadCommunicationsData();
+                break;
+            default:
+                console.log(`No specific data loader for ${page}`);
+        }
+    } catch (error) {
+        console.error(`Error loading ${page} data:`, error);
+        showError(`Failed to load ${page} data`);
+    }
+}
+
+// Load Dashboard Data
+async function loadDashboardData() {
+    try {
+        // Load members statistics
+        const { data: members, error: membersError } = await supabase
+            .from('profiles')
+            .select('id, is_active');
+        
+        if (membersError) throw membersError;
+        
+        const totalMembers = members.length;
+        const activeMembers = members.filter(m => m.is_active).length;
+        
+        document.getElementById('totalMembers').textContent = totalMembers;
+        document.getElementById('memberCount').textContent = totalMembers;
+        document.getElementById('activeMembers').textContent = activeMembers;
+        
+        // Load contributions total
+        const { data: contributions, error: contributionsError } = await supabase
+            .from('contributions')
+            .select('amount');
+        
+        if (contributionsError) throw contributionsError;
+        
+        const totalContributions = contributions.reduce((sum, c) => sum + parseFloat(c.amount || 0), 0);
+        document.getElementById('totalContributions').textContent = totalContributions.toLocaleString();
+        
+        // Load this month's contributions
+        const now = new Date();
+        const thisMonth = now.getMonth() + 1;
+        const thisYear = now.getFullYear();
+        
+        const { data: monthlyContributions, error: monthlyError } = await supabase
+            .from('contributions')
+            .select('amount')
+            .eq('contribution_month', thisMonth)
+            .eq('contribution_year', thisYear);
+        
+        if (!monthlyError && monthlyContributions) {
+            const monthTotal = monthlyContributions.reduce((sum, c) => sum + parseFloat(c.amount || 0), 0);
+            document.getElementById('monthContributions').textContent = monthTotal.toLocaleString();
+        }
+        
+        // Load active loans
+        const { data: activeLoans, error: loansError } = await supabase
+            .from('loans')
+            .select('principal_amount, status')
+            .eq('status', 'approved');
+        
+        if (!loansError && activeLoans) {
+            const activeLoansTotal = activeLoans.reduce((sum, loan) => sum + parseFloat(loan.principal_amount || 0), 0);
+            document.getElementById('activeLoans').textContent = activeLoansTotal.toLocaleString();
+        }
+        
+        // Load pending loans
+        const { data: pendingLoans, error: pendingError } = await supabase
+            .from('loans')
+            .select('id', { count: 'exact' })
+            .eq('status', 'pending');
+        
+        if (!pendingError) {
+            document.getElementById('pendingLoans').textContent = pendingLoans?.length || 0;
+            document.getElementById('pendingApprovals').textContent = pendingLoans?.length || 0;
+        }
+        
+        // Load chama balance (simplified calculation)
+        // In reality, you'd have a more complex calculation
+        const chamaBalance = totalContributions - (activeLoansTotal || 0);
+        document.getElementById('chamaBalance').textContent = chamaBalance.toLocaleString();
+        
+        // Load pending actions
+        await loadPendingActions();
+        
+        // Initialize charts
+        initializeCharts();
+        
+    } catch (error) {
+        console.error('Error loading dashboard data:', error);
+        throw error;
+    }
+}
+
+// Load Members Data with detailed info
+async function loadMembersData() {
+    try {
+        const { data: members, error } = await supabase
+            .from('profiles')
+            .select(`
+                id,
+                full_name,
+                email,
+                phone,
+                role,
+                is_active,
+                created_at,
+                members (
+                    membership_no,
+                    join_date,
+                    status
+                )
+            `)
+            .order('full_name');
+        
+        if (error) throw error;
+        
+        const tableBody = document.querySelector('#membersTable tbody');
+        if (!tableBody) return;
+        
+        tableBody.innerHTML = '';
+        
+        if (!members || members.length === 0) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="text-center py-4">
+                        <div class="empty-state">
+                            <i class="fas fa-users fa-2x text-muted mb-3"></i>
+                            <p class="text-muted">No members found</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+        
+        members.forEach(member => {
+            const row = document.createElement('tr');
+            const memberData = member.members?.[0] || {};
+            
+            row.innerHTML = `
+                <td>${memberData.membership_no || 'N/A'}</td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="avatar-sm me-2">
+                            <div class="avatar-title bg-primary rounded-circle text-white" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+                                ${member.full_name.charAt(0).toUpperCase()}
+                            </div>
+                        </div>
+                        <div>
+                            <strong>${member.full_name}</strong>
+                        </div>
+                    </div>
+                </td>
+                <td>${member.email}</td>
+                <td>${member.phone || 'N/A'}</td>
+                <td><span class="badge bg-info">${member.role}</span></td>
+                <td>
+                    <span class="status-badge ${member.is_active ? 'status-active' : 'status-inactive'}">
+                        ${member.is_active ? 'Active' : 'Inactive'}
+                    </span>
+                </td>
+                <td>${memberData.join_date ? new Date(memberData.join_date).toLocaleDateString() : 'N/A'}</td>
+                <td>
+                    <button class="btn-action btn-view" onclick="viewMember('${member.id}')" title="View">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn-action btn-edit" onclick="editMember('${member.id}')" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-action btn-delete" onclick="confirmDelete('${member.id}', '${member.full_name}')" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+        
+    } catch (error) {
+        console.error('Error loading members:', error);
+        const tableBody = document.querySelector('#membersTable tbody');
+        if (tableBody) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="text-center py-4 text-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Error loading members
+                    </td>
+                </tr>
+            `;
+        }
+        throw error;
+    }
+}
+
+// Load Loans Data
+async function loadLoansData() {
+    try {
+        const { data: loans, error } = await supabase
+            .from('loans')
+            .select(`
+                *,
+                profiles!loans_member_id_fkey(full_name),
+                members!inner(membership_no)
+            `)
+            .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        
+        const loansPage = document.getElementById('loansPage');
+        if (!loansPage) return;
+        
+        // Update loans page content
+        loansPage.innerHTML = `
+            <div class="table-container">
+                <div class="table-header">
+                    <h3><i class="fas fa-landmark me-2"></i>Loan Applications</h3>
+                    <div class="table-actions">
+                        <button class="btn btn-sm btn-outline-secondary" id="filterLoansBtn">
+                            <i class="fas fa-filter me-1"></i> Filter
+                        </button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover" id="loansTable">
+                        <thead>
+                            <tr>
+                                <th>Loan ID</th>
+                                <th>Member</th>
+                                <th>Principal</th>
+                                <th>Interest Rate</th>
+                                <th>Total Payable</th>
+                                <th>Status</th>
+                                <th>Applied Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${loans.map(loan => `
+                                <tr>
+                                    <td>#${loan.id.toString().padStart(4, '0')}</td>
+                                    <td>${loan.profiles?.full_name || 'Unknown'}</td>
+                                    <td>Ksh ${parseFloat(loan.principal_amount).toLocaleString()}</td>
+                                    <td>${loan.interest_rate}%</td>
+                                    <td>Ksh ${parseFloat(loan.total_payable || loan.principal_amount).toLocaleString()}</td>
+                                    <td>
+                                        <span class="status-badge ${getStatusClass(loan.status)}">
+                                            ${loan.status}
+                                        </span>
+                                    </td>
+                                    <td>${new Date(loan.created_at).toLocaleDateString()}</td>
+                                    <td>
+                                        ${loan.status === 'pending' ? `
+                                            <button class="btn btn-sm btn-success me-1" onclick="approveLoan('${loan.id}')">
+                                                <i class="fas fa-check"></i> Approve
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" onclick="rejectLoan('${loan.id}')">
+                                                <i class="fas fa-times"></i> Reject
+                                            </button>
+                                        ` : `
+                                            <button class="btn btn-sm btn-outline-primary" onclick="viewLoanDetails('${loan.id}')">
+                                                <i class="fas fa-eye"></i> View
+                                            </button>
+                                        `}
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+        
+    } catch (error) {
+        console.error('Error loading loans:', error);
+        throw error;
+    }
+}
+
+// Load Shareouts Data
+async function loadShareoutsData() {
+    try {
+        const { data: shareouts, error } = await supabase
+            .from('shareouts')
+            .select(`
+                *,
+                profiles!shareouts_approved_by_fkey(full_name),
+                shareout_details(count)
+            `)
+            .order('year', { ascending: false });
+        
+        if (error) throw error;
+        
+        const shareoutsPage = document.getElementById('shareoutsPage');
+        if (!shareoutsPage) return;
+        
+        shareoutsPage.innerHTML = `
+            <div class="table-container">
+                <div class="table-header">
+                    <h3><i class="fas fa-share-alt me-2"></i>Share-out History</h3>
+                    <div class="table-actions">
+                        <button class="btn btn-sm btn-primary" onclick="initiateShareout()">
+                            <i class="fas fa-plus me-1"></i> New Share-out
+                        </button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Year</th>
+                                <th>Total Amount</th>
+                                <th>Members</th>
+                                <th>Approved By</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${shareouts.map(shareout => `
+                                <tr>
+                                    <td>${shareout.year}</td>
+                                    <td>Ksh ${parseFloat(shareout.total_amount || 0).toLocaleString()}</td>
+                                    <td>${shareout.shareout_details?.[0]?.count || 0}</td>
+                                    <td>${shareout.profiles?.full_name || 'Pending'}</td>
+                                    <td>
+                                        <span class="status-badge ${shareout.approved_by ? 'status-active' : 'status-pending'}">
+                                            ${shareout.approved_by ? 'Approved' : 'Pending'}
+                                        </span>
+                                    </td>
+                                    <td>${new Date(shareout.created_at).toLocaleDateString()}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1" onclick="viewShareout('${shareout.id}')">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        ${!shareout.approved_by ? `
+                                            <button class="btn btn-sm btn-success" onclick="approveShareout('${shareout.id}')">
+                                                <i class="fas fa-check"></i> Approve
+                                            </button>
+                                        ` : ''}
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+        
+    } catch (error) {
+        console.error('Error loading shareouts:', error);
+        throw error;
+    }
+}
+
+// Load Pending Actions for Dashboard
+async function loadPendingActions() {
+    try {
+        // Get pending loans
+        const { data: pendingLoans, error: loansError } = await supabase
+            .from('loans')
+            .select(`
+                *,
+                profiles!loans_member_id_fkey(full_name)
+            `)
+            .eq('status', 'pending')
+            .limit(5);
+        
+        if (loansError) throw loansError;
+        
+        // Get pending shareouts
+        const { data: pendingShareouts, error: shareoutsError } = await supabase
+            .from('shareouts')
+            .select('*')
+            .is('approved_by', null)
+            .limit(5);
+        
+        if (shareoutsError) throw shareoutsError;
+        
+        const tableBody = document.getElementById('pendingActionsTable');
+        if (!tableBody) return;
+        
+        tableBody.innerHTML = '';
+        
+        // Add pending loans to table
+        pendingLoans?.forEach(loan => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><span class="badge bg-warning">Loan</span></td>
+                <td>${loan.profiles?.full_name || 'Unknown'}</td>
+                <td>Loan application for Ksh ${parseFloat(loan.principal_amount).toLocaleString()}</td>
+                <td>Ksh ${parseFloat(loan.principal_amount).toLocaleString()}</td>
+                <td>${new Date(loan.created_at).toLocaleDateString()}</td>
+                <td>
+                    <button class="btn btn-sm btn-success me-1" onclick="approveLoan('${loan.id}')">
+                        <i class="fas fa-check"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="rejectLoan('${loan.id}')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+        
+        // Add pending shareouts to table
+        pendingShareouts?.forEach(shareout => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><span class="badge bg-info">Share-out</span></td>
+                <td>All Members</td>
+                <td>Year ${shareout.year} share-out</td>
+                <td>Ksh ${parseFloat(shareout.total_amount || 0).toLocaleString()}</td>
+                <td>${new Date(shareout.created_at).toLocaleDateString()}</td>
+                <td>
+                    <button class="btn btn-sm btn-success me-1" onclick="approveShareout('${shareout.id}')">
+                        <i class="fas fa-check"></i> Approve
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="viewShareout('${shareout.id}')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+        
+        if (!pendingLoans?.length && !pendingShareouts?.length) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center py-3 text-muted">
+                        <i class="fas fa-check-circle me-2"></i>
+                        No pending actions
+                    </td>
+                </tr>
+            `;
+        }
+        
+    } catch (error) {
+        console.error('Error loading pending actions:', error);
+        const tableBody = document.getElementById('pendingActionsTable');
+        if (tableBody) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center py-3 text-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Error loading pending actions
+                    </td>
+                </tr>
+            `;
+        }
+    }
+}
+
+// Helper function for status classes
+function getStatusClass(status) {
+    switch(status) {
+        case 'approved':
+        case 'active':
+        case 'completed':
+            return 'status-active';
+        case 'pending':
+            return 'status-pending';
+        case 'rejected':
+        case 'inactive':
+            return 'status-inactive';
+        default:
+            return '';
+    }
+}
+
+// Setup Event Listeners
+function setupEventListeners() {
+    // Sidebar toggle
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            const icon = sidebarToggle.querySelector('i');
+            icon.classList.toggle('fa-chevron-left');
+            icon.classList.toggle('fa-chevron-right');
+        });
+    }
+    
+    // Mobile menu toggle
+    if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('mobile-open');
+        });
+    }
+    
+    // Menu item clicks
+    menuItems.forEach(item => {
+        item.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const page = item.getAttribute('data-page');
+            if (page) {
+                await switchPage(page);
+            }
+        });
+    });
+    
+    // Global search
+    const globalSearch = document.getElementById('globalSearch');
+    if (globalSearch) {
+        globalSearch.addEventListener('input', debounce((e) => {
+            performSearch(e.target.value);
+        }, 300));
+    }
+    
+    // Logout buttons
+    const logoutBtn = document.getElementById('logoutBtn');
+    const logoutDropdown = document.getElementById('logoutDropdown');
+    
+    if (logoutBtn) logoutBtn.addEventListener('click', logout);
+    if (logoutDropdown) logoutDropdown.addEventListener('click', logout);
+    
+    // Close mobile menu when clicking outside
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!sidebar.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+            sidebar.classList.remove('mobile-open');
+        }
+    });
+
+    // Save Member Button
+    const saveMemberBtn = document.getElementById('saveMemberBtn');
+    if (saveMemberBtn) {
+        saveMemberBtn.addEventListener('click', saveMember);
+    }
+}
+
+// Save New Member
+async function saveMember() {
+    const form = document.getElementById('addMemberForm');
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+    
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+    const btn = document.getElementById('saveMemberBtn');
+    
+    try {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
+        
+        // 1. Create Auth User using a secondary client to avoid signing out the chairperson
+        const tempClient = window.supabase.createClient(ENV.SUPABASE_URL, ENV.SUPABASE_ANON_KEY, {
+            auth: {
+                persistSession: false,
+                autoRefreshToken: false,
+                detectSessionInUrl: false
+            }
+        });
+
+        const { data: authData, error: authError } = await tempClient.auth.signUp({
+            email: data.email,
+            password: data.password,
+            options: {
+                data: {
+                    full_name: data.full_name,
+                    role: data.role
+                }
+            }
+        });
+
+        if (authError) throw new Error(`Auth Error: ${authError.message}`);
+        if (!authData.user) throw new Error("Failed to create auth user");
+
+        // 2. Insert into profiles (if not handled by trigger) or update extra details
+        // Note: The trigger usually handles creating the profile from auth.users meta_data
+        // But we might need to update phone or other fields if the trigger is simple.
+        
+        // Let's assume we need to upsert/update the profile with specific details
+        // We use the MAIN client here because we (Chairperson) hopefully have RLS permissions to update profiles
+        const { error: profileError } = await supabase
+            .from('profiles')
+            .update({
+                phone: data.phone,
+                role: data.role // Ensure role is set correctly
+            })
+            .eq('id', authData.user.id);
+
+        if (profileError) {
+             // If update fails, it might be because the profile trigger hasn't fired yet or RLS.
+             // We'll log it but not fail the whole process if possible, but for now throw.
+             console.warn("Profile update warning:", profileError);
+        }
+
+        // 3. Insert into members table
+        const { error: memberError } = await supabase
+            .from('members')
+            .insert({
+                user_id: authData.user.id,
+                membership_no: data.membership_no,
+                status: data.status || 'active',
+                join_date: new Date().toISOString()
+            });
+
+        if (memberError) throw new Error(`Member Data Error: ${memberError.message}`);
+
+        // Success
+        alert('Member added successfully!');
+        
+        // Reset and close modal
+        form.reset();
+        const modal = bootstrap.Modal.getInstance(document.getElementById('addMemberModal'));
+        modal.hide();
+        
+        // Reload list
+        await loadMembersData();
+        
+    } catch (error) {
+        console.error('Error saving member:', error);
+        alert(error.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Save Member';
+    }
+}
+
+// Debounce function for search
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Perform Search
+async function performSearch(searchTerm) {
+    if (!searchTerm.trim()) return;
+    
+    try {
+        // Search across multiple tables
+        const searchResults = await Promise.all([
+            // Search members
+            supabase.from('profiles')
+                .select('id, full_name, email, role')
+                .or(`full_name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%`)
+                .limit(5),
+            
+            // Search loans
+            supabase.from('loans')
+                .select('id, principal_amount, status')
+                .or(`id.eq.${parseInt(searchTerm) || 0}`)
+                .limit(5),
+        ]);
+        
+        // Process and display search results
+        console.log('Search results:', searchResults);
+        // You can implement a search results modal or dropdown here
+        
+    } catch (error) {
+        console.error('Search error:', error);
+    }
+}
+
+// Show Error Message
+function showError(message) {
+    // You can implement a toast notification or alert system here
+    console.error('Error:', message);
+    alert(message); // Temporary - replace with better error handling
+}
+
+// Initialize Charts (for dashboard)
+function initializeCharts() {
+    // Your chart initialization code here
+}
+
+// Logout Function
+async function logout() {
+    try {
+        await supabase.auth.signOut();
+        window.location.href = '../../index.html';
+    } catch (error) {
+        console.error('Error logging out:', error);
+        showError('Logout failed. Please try again.');
+    }
+}
+
+// Action Functions - Make them globally available
+window.viewMember = async (memberId) => {
+    try {
+        const { data: member, error } = await supabase
+            .from('profiles')
+            .select(`
+                *,
+                members (*)
+            `)
+            .eq('id', memberId)
+            .single();
+        
+        if (error) throw error;
+        
+        // Show member details modal
+        alert(`Viewing member: ${member.full_name}\nEmail: ${member.email}\nRole: ${member.role}`);
+        
+    } catch (error) {
+        console.error('Error viewing member:', error);
+        showError('Failed to load member details');
+    }
+};
+
+window.editMember = async (memberId) => {
+    // Load member data and show edit modal
+    console.log('Edit member:', memberId);
+    // Implement edit modal
+};
+
+window.confirmDelete = (memberId, memberName) => {
+    if (confirm(`Are you sure you want to delete ${memberName}? This action cannot be undone.`)) {
+        deleteMember(memberId);
+    }
+};
+
+async function deleteMember(memberId) {
+    try {
+        const { error } = await supabase
+            .from('profiles')
+            .delete()
+            .eq('id', memberId);
+        
+        if (error) throw error;
+        
+        showError('Member deleted successfully');
+        await loadMembersData();
+        
+    } catch (error) {
+        console.error('Error deleting member:', error);
+        showError('Failed to delete member');
+    }
+}
+
+window.approveLoan = async (loanId) => {
+    try {
+        const { error } = await supabase
+            .from('loans')
+            .update({ 
+                status: 'approved',
+                approved_by: currentUser.id 
+            })
+            .eq('id', loanId);
+        
+        if (error) throw error;
+        
+        showError('Loan approved successfully');
+        await loadDashboardData();
+        await loadLoansData();
+        
+    } catch (error) {
+        console.error('Error approving loan:', error);
+        showError('Failed to approve loan');
+    }
+};
+
+window.rejectLoan = async (loanId) => {
+    try {
+        const { error } = await supabase
+            .from('loans')
+            .update({ 
+                status: 'rejected',
+                approved_by: currentUser.id 
+            })
+            .eq('id', loanId);
+        
+        if (error) throw error;
+        
+        showError('Loan rejected');
+        await loadDashboardData();
+        await loadLoansData();
+        
+    } catch (error) {
+        console.error('Error rejecting loan:', error);
+        showError('Failed to reject loan');
+    }
+};
+
+window.approveShareout = async (shareoutId) => {
+    try {
+        const { error } = await supabase
+            .from('shareouts')
+            .update({ 
+                approved_by: currentUser.id 
+            })
+            .eq('id', shareoutId);
+        
+        if (error) throw error;
+        
+        showError('Share-out approved successfully');
+        await loadDashboardData();
+        await loadShareoutsData();
+        
+    } catch (error) {
+        console.error('Error approving shareout:', error);
+        showError('Failed to approve share-out');
+    }
+};
+
+// Add other page data loaders as needed
+async function loadContributionsData() {
+    // Implement contributions data loading
+}
+
+async function loadFinancialSummary() {
+    // Implement financial summary loading
+}
+
+async function loadMeetingsData() {
+    // Implement meetings data loading
+}
+
+async function loadReportsData() {
+    // Implement reports data loading
+}
+
+async function loadCommunicationsData() {
+    // Implement communications data loading
+}
+
+// Make switchPage available globally for testing
+  window.switchPage = switchPage; 
+  </script>
+</body>
+</html>

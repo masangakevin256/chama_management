@@ -1,0 +1,10 @@
+/* Auth Pages */
+body.auth-page {
+    background: linear-gradient(135deg, #71b7e6, #9b59b6);
+    min-height: 100vh;
+}
+
+.card.auth-card {
+    border: none;
+    border-radius: 1rem;
+}

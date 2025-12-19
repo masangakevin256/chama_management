@@ -1,0 +1,2370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secretary Dashboard | Chama Management Suite</title>
+  
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="secretary-dashboard.css">
+</head>
+<body>
+  <!-- Secretary Dashboard Container -->
+  <div class="secretary-dashboard-container">
+    
+    <!-- Sidebar -->
+    <aside class="secretary-sidebar" id="secretarySidebar">
+      <div class="secretary-sidebar-header">
+        <h3><i class="fas fa-clipboard-list"></i> <span class="secretary-menu-text">Chama Secretary</span></h3>
+        <div class="secretary-badge">SECRETARY</div>
+        <button class="sidebar-toggle" id="secretarySidebarToggle">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+      </div>
+      
+      <!-- User Info -->
+      <div class="secretary-user-info">
+        <div class="secretary-avatar" id="secretaryAvatar">
+          <!-- Initial will be filled by JS -->
+        </div>
+        <div class="secretary-name" id="secretaryFullName">Loading...</div>
+        <div class="secretary-role">Secretary</div>
+        <div class="member-meta mt-2">
+          <div><i class="fas fa-file-alt"></i> Records & Communications</div>
+        </div>
+      </div>
+      
+      <!-- Sidebar Menu -->
+      <nav class="secretary-menu">
+        <a href="#dashboard" class="secretary-menu-item active" data-page="dashboard">
+          <i class="fas fa-tachometer-alt"></i>
+          <span class="secretary-menu-text">Dashboard</span>
+          <div class="financial-indicator"></div>
+        </a>
+        
+        <a href="#members" class="secretary-menu-item" data-page="members">
+          <i class="fas fa-user-plus"></i>
+          <span class="secretary-menu-text">Member Registration</span>
+          <span class="secretary-menu-badge" id="pendingRegistrations">0</span>
+        </a>
+        
+        <a href="#meetings" class="secretary-menu-item" data-page="meetings">
+          <i class="fas fa-calendar-alt"></i>
+          <span class="secretary-menu-text">Meetings & Minutes</span>
+          <span class="secretary-menu-badge" id="upcomingMeetings">0</span>
+        </a>
+        
+        <a href="#attendance" class="secretary-menu-item" data-page="attendance">
+          <i class="fas fa-clipboard-check"></i>
+          <span class="secretary-menu-text">Attendance</span>
+        </a>
+        
+        <a href="#communications" class="secretary-menu-item" data-page="communications">
+          <i class="fas fa-bullhorn"></i>
+          <span class="secretary-menu-text">Communications</span>
+          <span class="secretary-menu-badge" id="unreadMessages">0</span>
+        </a>
+        
+        <a href="#documents" class="secretary-menu-item" data-page="documents">
+          <i class="fas fa-file-contract"></i>
+          <span class="secretary-menu-text">Documents</span>
+        </a>
+        
+        <a href="#reports" class="secretary-menu-item" data-page="reports">
+          <i class="fas fa-chart-bar"></i>
+          <span class="secretary-menu-text">Reports</span>
+        </a>
+        
+        <a href="#directory" class="secretary-menu-item" data-page="directory">
+          <i class="fas fa-address-book"></i>
+          <span class="secretary-menu-text">Member Directory</span>
+        </a>
+        
+        <a href="#calendar" class="secretary-menu-item" data-page="calendar">
+          <i class="fas fa-calendar-week"></i>
+          <span class="secretary-menu-text">Calendar</span>
+        </a>
+        
+        <div class="mt-4">
+          <a href="#settings" class="secretary-menu-item" data-page="settings">
+            <i class="fas fa-cog"></i>
+            <span class="secretary-menu-text">Settings</span>
+          </a>
+          
+          <a href="#" class="secretary-menu-item" id="secretaryLogoutBtn">
+            <i class="fas fa-sign-out-alt"></i>
+            <span class="secretary-menu-text">Logout</span>
+          </a>
+        </div>
+      </nav>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="secretary-main-content">
+      <!-- Header -->
+      <header class="secretary-header">
+        <div class="secretary-header-left">
+          <button class="secretary-mobile-menu-btn" id="secretaryMobileMenuBtn">
+            <i class="fas fa-bars"></i>
+          </button>
+          <h1><i class="fas fa-clipboard-list"></i> <span id="secretaryPageTitle">Secretary Dashboard</span></h1>
+          <p id="secretaryPageSubtitle">Manage records, meetings, and communications</p>
+        </div>
+        
+        <div class="secretary-header-right">
+          <div class="secretary-quick-stats hide-on-mobile">
+            <div class="secretary-stat-item">
+              <i class="fas fa-users text-primary"></i>
+              <div>
+                <div class="secretary-stat-label">Total Members</div>
+                <div class="secretary-stat-value"><span id="quickMembersCount">0</span></div>
+              </div>
+            </div>
+            <div class="secretary-stat-item">
+              <i class="fas fa-calendar-check text-success"></i>
+              <div>
+                <div class="secretary-stat-label">This Month</div>
+                <div class="secretary-stat-value"><span id="quickMeetingsCount">0</span></div>
+              </div>
+            </div>
+            <div class="secretary-stat-item">
+              <i class="fas fa-bell text-warning"></i>
+              <div>
+                <div class="secretary-stat-label">Pending</div>
+                <div class="secretary-stat-value"><span id="quickPendingCount">0</span></div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="dropdown">
+            <button class="btn btn-primary dropdown-toggle" type="button" id="secretaryActionsDropdown" data-bs-toggle="dropdown">
+              <i class="fas fa-bolt me-2"></i>Quick Actions
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="#" id="newMeetingBtn"><i class="fas fa-calendar-plus me-2"></i>Schedule Meeting</a></li>
+              <li><a class="dropdown-item" href="#" id="newAnnouncementBtn"><i class="fas fa-bullhorn me-2"></i>New Announcement</a></li>
+              <li><a class="dropdown-item" href="#" id="registerMemberBtn"><i class="fas fa-user-plus me-2"></i>Register Member</a></li>
+              <li><a class="dropdown-item" href="#" id="generateReportBtn"><i class="fas fa-file-pdf me-2"></i>Generate Report</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#attendance"><i class="fas fa-clipboard-check me-2"></i>Take Attendance</a></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      
+      <!-- Content Area -->
+      <div class="secretary-content">
+        
+        <!-- Secretary Dashboard Page -->
+        <div id="dashboardPage" class="page-content">
+          <!-- Welcome Section -->
+          <div class="secretary-card mb-4">
+            <div class="row align-items-center">
+              <div class="col-md-8">
+                <h3 class="mb-3">Welcome, <span id="welcomeSecretaryName">Secretary</span>! 📋</h3>
+                <p class="text-muted mb-0">Manage chama records, schedule meetings, handle communications, and generate reports from your secretary dashboard.</p>
+              </div>
+              <div class="col-md-4 text-end">
+                <div class="secretary-card-icon d-inline-flex">
+                  <i class="fas fa-clipboard-check"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Quick Actions -->
+          <div class="quick-actions-grid mb-4">
+            <div class="quick-action-card" onclick="switchPage('members')">
+              <div class="quick-action-icon">
+                <i class="fas fa-user-plus"></i>
+              </div>
+              <h4 class="quick-action-title">Register Member</h4>
+              <p class="quick-action-desc">Add new members to the chama</p>
+            </div>
+            
+            <div class="quick-action-card" onclick="scheduleMeeting()">
+              <div class="quick-action-icon">
+                <i class="fas fa-calendar-plus"></i>
+              </div>
+              <h4 class="quick-action-title">Schedule Meeting</h4>
+              <p class="quick-action-desc">Plan and schedule chama meetings</p>
+            </div>
+            
+            <div class="quick-action-card" onclick="createAnnouncement()">
+              <div class="quick-action-icon">
+                <i class="fas fa-bullhorn"></i>
+              </div>
+              <h4 class="quick-action-title">Send Announcement</h4>
+              <p class="quick-action-desc">Communicate with all members</p>
+            </div>
+            
+            <div class="quick-action-card" onclick="switchPage('reports')">
+              <div class="quick-action-icon">
+                <i class="fas fa-file-pdf"></i>
+              </div>
+              <h4 class="quick-action-title">Generate Report</h4>
+              <p class="quick-action-desc">Create meeting or activity reports</p>
+            </div>
+          </div>
+          
+          <!-- Overview Cards -->
+          <div class="secretary-overview">
+            <div class="secretary-card">
+              <div class="secretary-card-icon">
+                <i class="fas fa-users"></i>
+              </div>
+              <h4 class="secretary-card-title">Total Members</h4>
+              <div class="secretary-card-value" id="totalMembersCount">0</div>
+              <p class="secretary-card-subtext"><span id="activeMembersCount">0</span> active members</p>
+              <button class="btn btn-sm btn-outline-primary mt-3" onclick="switchPage('members')">
+                <i class="fas fa-list me-1"></i> View All
+              </button>
+            </div>
+            
+            <div class="secretary-card">
+              <div class="secretary-card-icon" style="background: linear-gradient(135deg, #198754, #20c997);">
+                <i class="fas fa-calendar-check"></i>
+              </div>
+              <h4 class="secretary-card-title">Upcoming Meetings</h4>
+              <div class="secretary-card-value" id="upcomingMeetingsCount">0</div>
+              <p class="secretary-card-subtext">Next: <span id="nextMeetingDate">No meeting</span></p>
+              <button class="btn btn-sm btn-outline-success mt-3" onclick="switchPage('meetings')">
+                <i class="fas fa-calendar me-1"></i> View Calendar
+              </button>
+            </div>
+            
+            <div class="secretary-card">
+              <div class="secretary-card-icon" style="background: linear-gradient(135deg, #6f42c1, #a370f7);">
+                <i class="fas fa-file-alt"></i>
+              </div>
+              <h4 class="secretary-card-title">Documents</h4>
+              <div class="secretary-card-value" id="totalDocuments">0</div>
+              <p class="secretary-card-subtext">Meeting minutes and records</p>
+              <button class="btn btn-sm btn-outline-info mt-3" onclick="switchPage('documents')">
+                <i class="fas fa-folder me-1"></i> View Documents
+              </button>
+            </div>
+            
+            <div class="secretary-card">
+              <div class="secretary-card-icon" style="background: linear-gradient(135deg, #fd7e14, #ffc107);">
+                <i class="fas fa-bullhorn"></i>
+              </div>
+              <h4 class="secretary-card-title">Announcements</h4>
+              <div class="secretary-card-value" id="totalAnnouncements">0</div>
+              <p class="secretary-card-subtext"><span id="unreadAnnouncements">0</span> unread</p>
+              <button class="btn btn-sm btn-outline-warning mt-3" onclick="switchPage('communications')">
+                <i class="fas fa-envelope me-1"></i> View All
+              </button>
+            </div>
+          </div>
+          
+          <!-- Recent Activities -->
+          <div class="row mt-4">
+            <div class="col-lg-8">
+              <div class="secretary-table-container">
+                <div class="secretary-table-header">
+                  <h3><i class="fas fa-history me-2"></i>Recent Activities</h3>
+                  <button class="btn btn-sm btn-outline-primary" onclick="loadRecentActivities()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                  </button>
+                </div>
+                <div class="table-responsive">
+                  <table class="table secretary-table">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Activity</th>
+                        <th>Type</th>
+                        <th>Details</th>
+                        <th>Recorded By</th>
+                      </tr>
+                    </thead>
+                    <tbody id="recentActivitiesTable">
+                      <!-- Filled by JavaScript -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-lg-4">
+              <div class="secretary-card">
+                <h4 class="secretary-card-title mb-3">Today's Agenda</h4>
+                <div id="todaysAgenda">
+                  <!-- Filled by JavaScript -->
+                </div>
+                <div class="mt-4">
+                  <button class="btn btn-primary w-100" onclick="switchPage('calendar')">
+                    <i class="fas fa-calendar-day me-2"></i> View Full Calendar
+                  </button>
+                </div>
+              </div>
+              
+              <div class="secretary-card mt-4">
+                <h4 class="secretary-card-title mb-3">Quick Notes</h4>
+                <textarea class="form-control" id="quickNotes" rows="5" placeholder="Take quick notes here..."></textarea>
+                <button class="btn btn-sm btn-outline-secondary mt-3" onclick="saveQuickNotes()">
+                  <i class="fas fa-save me-1"></i> Save Notes
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Member Registration Page -->
+        <div id="membersPage" class="page-content d-none">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h2><i class="fas fa-user-plus me-2"></i>Member Registration</h2>
+              <p class="text-muted mb-0">Register new members and manage existing members</p>
+            </div>
+            <div class="export-buttons">
+              <button class="btn-export" id="exportMembersExcel">
+                <i class="fas fa-file-excel"></i> Export
+              </button>
+              <button class="btn btn-primary" id="addMemberBtn">
+                <i class="fas fa-user-plus me-2"></i>Register New Member
+              </button>
+            </div>
+          </div>
+          
+          <!-- Registration Form -->
+          <div class="registration-form-container" id="registrationFormContainer" style="display: none;">
+            <h4 class="form-section-title"><i class="fas fa-user-edit me-2"></i>Register New Member</h4>
+            <form id="memberRegistrationForm">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Full Name *</label>
+                  <input type="text" class="form-control" id="regFullName" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Email Address *</label>
+                  <input type="email" class="form-control" id="regEmail" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Phone Number *</label>
+                  <input type="tel" class="form-control" id="regPhone" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Date of Birth</label>
+                  <input type="date" class="form-control" id="regDob">
+                </div>
+              </div>
+              
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Physical Address</label>
+                  <textarea class="form-control" id="regAddress" rows="2"></textarea>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">National ID Number</label>
+                  <input type="text" class="form-control" id="regNationalId">
+                </div>
+              </div>
+              
+              <div class="form-section">
+                <h5 class="form-section-title"><i class="fas fa-id-card me-2"></i>Chama Membership Details</h5>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Membership Number</label>
+                    <input type="text" class="form-control" id="regMembershipNo" placeholder="Auto-generated if left empty">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Join Date *</label>
+                    <input type="date" class="form-control" id="regJoinDate" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Initial Status *</label>
+                    <select class="form-select" id="regStatus" required>
+                      <option value="active">Active</option>
+                      <option value="pending">Pending Approval</option>
+                      <option value="inactive">Inactive</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Role *</label>
+                    <select class="form-select" id="regRole" required>
+                      <option value="member">Member</option>
+                      <option value="treasurer">Treasurer</option>
+                      <option value="secretary">Secretary</option>
+                      <option value="chairperson">Chairperson</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Emergency Contact Name</label>
+                    <input type="text" class="form-control" id="regEmergencyName">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Emergency Contact Phone</label>
+                    <input type="tel" class="form-control" id="regEmergencyPhone">
+                  </div>
+                </div>
+              </div>
+              
+              <div class="form-section">
+                <h5 class="form-section-title"><i class="fas fa-camera me-2"></i>Profile Photo (Optional)</h5>
+                <div class="form-group">
+                  <input type="file" class="form-control" id="regProfilePhoto" accept="image/*">
+                  <small class="text-muted">Max file size: 2MB. Supported formats: JPG, PNG</small>
+                </div>
+              </div>
+              
+              <div class="d-flex justify-content-between mt-4">
+                <button type="button" class="btn btn-secondary" id="cancelRegistrationBtn">Cancel</button>
+                <button type="submit" class="btn btn-primary" id="submitRegistrationBtn">
+                  <i class="fas fa-save me-2"></i>Register Member
+                </button>
+              </div>
+            </form>
+          </div>
+          
+          <!-- Members Table -->
+          <div class="secretary-table-container">
+            <div class="secretary-table-header">
+              <h3>Registered Members</h3>
+              <div class="secretary-filters">
+                <div class="secretary-filter-group">
+                  <label class="secretary-filter-label">Status</label>
+                  <select class="form-select" id="memberStatusFilter">
+                    <option value="">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="pending">Pending</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                </div>
+                <div class="secretary-filter-group">
+                  <label class="secretary-filter-label">Role</label>
+                  <select class="form-select" id="memberRoleFilter">
+                    <option value="">All Roles</option>
+                    <option value="member">Member</option>
+                    <option value="treasurer">Treasurer</option>
+                    <option value="secretary">Secretary</option>
+                    <option value="chairperson">Chairperson</option>
+                  </select>
+                </div>
+                <div class="secretary-filter-group">
+                  <label class="secretary-filter-label">Search</label>
+                  <input type="text" class="form-control" id="memberSearch" placeholder="Search members...">
+                </div>
+                <div class="secretary-filter-group align-self-end">
+                  <button class="btn btn-primary" id="applyMemberFiltersBtn">Filter</button>
+                </div>
+              </div>
+            </div>
+            <div class="scrollable-table">
+              <table class="table secretary-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Contact</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Join Date</th>
+                    <th>Last Active</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="membersManagementTable">
+                  <!-- Filled by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Meetings & Minutes Page -->
+        <div id="meetingsPage" class="page-content d-none">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h2><i class="fas fa-calendar-alt me-2"></i>Meetings & Minutes</h2>
+              <p class="text-muted mb-0">Schedule meetings, record minutes, and manage agendas</p>
+            </div>
+            <button class="btn btn-primary" id="scheduleMeetingBtn">
+              <i class="fas fa-calendar-plus me-2"></i>Schedule New Meeting
+            </button>
+          </div>
+          
+          <!-- Meetings Tabs -->
+          <ul class="nav nav-tabs mb-4" id="meetingsTabs">
+            <li class="nav-item">
+              <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#upcomingMeetingsTab">Upcoming (<span id="upcomingTabCount">0</span>)</button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#pastMeetingsTab">Past Meetings</button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#draftMinutesTab">Draft Minutes</button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#meetingTemplatesTab">Templates</button>
+            </li>
+          </ul>
+          
+          <div class="tab-content" id="meetingsContent">
+            <!-- Upcoming Meetings -->
+            <div class="tab-pane fade show active" id="upcomingMeetingsTab">
+              <div id="upcomingMeetingsList">
+                <!-- Filled by JavaScript -->
+              </div>
+            </div>
+            
+            <!-- Past Meetings -->
+            <div class="tab-pane fade" id="pastMeetingsTab">
+              <div id="pastMeetingsList">
+                <!-- Filled by JavaScript -->
+              </div>
+            </div>
+            
+            <!-- Draft Minutes -->
+            <div class="tab-pane fade" id="draftMinutesTab">
+              <div id="draftMinutesList">
+                <!-- Filled by JavaScript -->
+              </div>
+            </div>
+            
+            <!-- Meeting Templates -->
+            <div class="tab-pane fade" id="meetingTemplatesTab">
+              <div class="document-grid">
+                <div class="document-card">
+                  <div class="document-header">
+                    <h5 class="document-title">Regular Monthly Meeting</h5>
+                    <span class="secretary-status-badge status-draft">Template</span>
+                  </div>
+                  <p class="document-meta">Standard agenda for monthly meetings</p>
+                  <p class="text-muted small">Includes: Opening prayer, review of minutes, treasurer's report, new business, any other business, closing prayer.</p>
+                  <div class="document-actions">
+                    <button class="secretary-action-btn btn-schedule" onclick="useTemplate('monthly')">
+                      <i class="fas fa-calendar-plus"></i> Use Template
+                    </button>
+                    <button class="secretary-action-btn">
+                      <i class="fas fa-eye"></i> Preview
+                    </button>
+                  </div>
+                </div>
+                
+                <div class="document-card">
+                  <div class="document-header">
+                    <h5 class="document-title">Annual General Meeting</h5>
+                    <span class="secretary-status-badge status-draft">Template</span>
+                  </div>
+                  <p class="document-meta">Comprehensive AGM agenda</p>
+                  <p class="text-muted small">Includes: Annual reports, elections, financial review, strategic planning, special resolutions.</p>
+                  <div class="document-actions">
+                    <button class="secretary-action-btn btn-schedule" onclick="useTemplate('agm')">
+                      <i class="fas fa-calendar-plus"></i> Use Template
+                    </button>
+                    <button class="secretary-action-btn">
+                      <i class="fas fa-eye"></i> Preview
+                    </button>
+                  </div>
+                </div>
+                
+                <div class="document-card">
+                  <div class="document-header">
+                    <h5 class="document-title">Emergency Meeting</h5>
+                    <span class="secretary-status-badge status-draft">Template</span>
+                  </div>
+                  <p class="document-meta">Template for urgent meetings</p>
+                  <p class="text-muted small">Includes: Emergency agenda, quick decision-making, action items, follow-up.</p>
+                  <div class="document-actions">
+                    <button class="secretary-action-btn btn-schedule" onclick="useTemplate('emergency')">
+                      <i class="fas fa-calendar-plus"></i> Use Template
+                    </button>
+                    <button class="secretary-action-btn">
+                      <i class="fas fa-eye"></i> Preview
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Attendance Page -->
+        <div id="attendancePage" class="page-content d-none">
+          <div class="mb-4">
+            <h2><i class="fas fa-clipboard-check me-2"></i>Attendance Management</h2>
+            <p class="text-muted">Take attendance and view attendance records</p>
+          </div>
+          
+          <!-- Attendance Statistics -->
+          <div class="attendance-stats">
+            <div class="stat-card">
+              <div class="stat-value" id="avgAttendanceRate">0%</div>
+              <div class="stat-label">Average Attendance Rate</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="totalMeetingsHeld">0</div>
+              <div class="stat-label">Total Meetings Held</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="perfectAttendance">0</div>
+              <div class="stat-label">Perfect Attendance</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="lowAttendance">0</div>
+              <div class="stat-label">Low Attendance (<50%)</div>
+            </div>
+          </div>
+          
+          <!-- Take Attendance -->
+          <div class="attendance-sheet mt-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h4><i class="fas fa-clipboard-list me-2"></i>Take Attendance</h4>
+              <div>
+                <select class="form-select me-2" id="attendanceMeetingSelect" style="width: auto; display: inline-block;">
+                  <option value="">Select Meeting</option>
+                </select>
+                <button class="btn btn-primary" id="startAttendanceBtn">
+                  <i class="fas fa-play me-2"></i>Start Attendance
+                </button>
+              </div>
+            </div>
+            
+            <div id="attendanceSheetContainer" style="display: none;">
+              <div class="attendance-list" id="attendanceList">
+                <!-- Filled by JavaScript -->
+              </div>
+              <div class="mt-4">
+                <button class="btn btn-success" id="saveAttendanceBtn">
+                  <i class="fas fa-save me-2"></i>Save Attendance
+                </button>
+                <button class="btn btn-secondary ms-2" id="cancelAttendanceBtn">
+                  <i class="fas fa-times me-2"></i>Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Attendance History -->
+          <div class="secretary-table-container mt-4">
+            <div class="secretary-table-header">
+              <h3><i class="fas fa-history me-2"></i>Attendance History</h3>
+            </div>
+            <div class="table-responsive">
+              <table class="table secretary-table">
+                <thead>
+                  <tr>
+                    <th>Meeting Date</th>
+                    <th>Agenda</th>
+                    <th>Present</th>
+                    <th>Absent</th>
+                    <th>Attendance Rate</th>
+                    <th>Recorded By</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="attendanceHistoryTable">
+                  <!-- Filled by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Communications Page -->
+        <div id="communicationsPage" class="page-content d-none">
+          <div class="mb-4">
+            <h2><i class="fas fa-bullhorn me-2"></i>Communications Center</h2>
+            <p class="text-muted">Send announcements and communicate with members</p>
+          </div>
+          
+          <!-- Communication Tabs -->
+          <div class="communication-center">
+            <div class="communication-tabs">
+              <button class="communication-tab active" data-target="announcements">Announcements</button>
+              <button class="communication-tab" data-target="notifications">Notifications</button>
+              <button class="communication-tab" data-target="broadcast">Broadcast</button>
+              <button class="communication-tab" data-target="templates">Templates</button>
+            </div>
+            
+            <!-- Announcements Tab -->
+            <div class="communication-tab-content active" id="announcementsTab">
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4>Announcements</h4>
+                <button class="btn btn-primary" onclick="createAnnouncement()">
+                  <i class="fas fa-plus me-2"></i>New Announcement
+                </button>
+              </div>
+              
+              <div id="announcementsList">
+                <!-- Filled by JavaScript -->
+              </div>
+            </div>
+            
+            <!-- Notifications Tab -->
+            <div class="communication-tab-content" id="notificationsTab" style="display: none;">
+              <h4>Notifications</h4>
+              <div id="notificationsContent">
+                <!-- Filled by JavaScript -->
+              </div>
+            </div>
+            
+            <!-- Broadcast Tab -->
+            <div class="communication-tab-content" id="broadcastTab" style="display: none;">
+              <h4>Broadcast Message</h4>
+              <div class="secretary-card">
+                <form id="broadcastForm">
+                  <div class="form-group mb-3">
+                    <label class="form-label">Recipients</label>
+                    <select class="form-select" id="broadcastRecipients" multiple>
+                      <option value="all" selected>All Members</option>
+                      <!-- Will be populated with member groups -->
+                    </select>
+                  </div>
+                  <div class="form-group mb-3">
+                    <label class="form-label">Subject</label>
+                    <input type="text" class="form-control" id="broadcastSubject" required>
+                  </div>
+                  <div class="form-group mb-3">
+                    <label class="form-label">Message</label>
+                    <textarea class="form-control" id="broadcastMessage" rows="6" required></textarea>
+                  </div>
+                  <div class="form-group mb-3">
+                    <label class="form-label">Send Via</label>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="sendEmail" checked>
+                      <label class="form-check-label" for="sendEmail">Email</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="sendSMS">
+                      <label class="form-check-label" for="sendSMS">SMS</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="sendInApp" checked>
+                      <label class="form-check-label" for="sendInApp">In-App Notification</label>
+                    </div>
+                  </div>
+                  <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane me-2"></i>Send Broadcast
+                  </button>
+                </form>
+              </div>
+            </div>
+            
+            <!-- Templates Tab -->
+            <div class="communication-tab-content" id="templatesTab" style="display: none;">
+              <h4>Message Templates</h4>
+              <div class="document-grid">
+                <!-- Template cards will be filled by JavaScript -->
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Documents Page -->
+        <div id="documentsPage" class="page-content d-none">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h2><i class="fas fa-file-contract me-2"></i>Document Management</h2>
+              <p class="text-muted mb-0">Store and manage chama documents and records</p>
+            </div>
+            <button class="btn btn-primary" id="uploadDocumentBtn">
+              <i class="fas fa-upload me-2"></i>Upload Document
+            </button>
+          </div>
+          
+          <!-- Document Categories -->
+          <div class="secretary-filters mb-4">
+            <div class="secretary-filter-group">
+              <label class="secretary-filter-label">Category</label>
+              <select class="form-select" id="documentCategoryFilter">
+                <option value="">All Categories</option>
+                <option value="minutes">Meeting Minutes</option>
+                <option value="reports">Reports</option>
+                <option value="financial">Financial Records</option>
+                <option value="legal">Legal Documents</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="secretary-filter-group">
+              <label class="secretary-filter-label">Date Range</label>
+              <input type="date" class="form-control" id="documentStartDate">
+            </div>
+            <div class="secretary-filter-group">
+              <label class="secretary-filter-label">To</label>
+              <input type="date" class="form-control" id="documentEndDate">
+            </div>
+            <div class="secretary-filter-group align-self-end">
+              <button class="btn btn-primary" id="applyDocumentFiltersBtn">Filter</button>
+            </div>
+          </div>
+          
+          <!-- Documents Grid -->
+          <div class="document-grid" id="documentsGrid">
+            <!-- Filled by JavaScript -->
+          </div>
+        </div>
+        
+        <!-- Reports Page -->
+        <div id="reportsPage" class="page-content d-none">
+          <div class="mb-4">
+            <h2><i class="fas fa-chart-bar me-2"></i>Reports & Analytics</h2>
+            <p class="text-muted">Generate and view chama reports</p>
+          </div>
+          
+          <!-- Report Templates -->
+          <div class="report-templates">
+            <div class="report-template-card" onclick="generateReport('attendance')">
+              <div class="report-template-icon">
+                <i class="fas fa-clipboard-check"></i>
+              </div>
+              <h4>Attendance Report</h4>
+              <p class="text-muted small">Member attendance analysis</p>
+            </div>
+            
+            <div class="report-template-card" onclick="generateReport('membership')">
+              <div class="report-template-icon">
+                <i class="fas fa-users"></i>
+              </div>
+              <h4>Membership Report</h4>
+              <p class="text-muted small">Member demographics and status</p>
+            </div>
+            
+            <div class="report-template-card" onclick="generateReport('meetings')">
+              <div class="report-template-icon">
+                <i class="fas fa-calendar-alt"></i>
+              </div>
+              <h4>Meetings Report</h4>
+              <p class="text-muted small">Meeting frequency and topics</p>
+            </div>
+            
+            <div class="report-template-card" onclick="generateReport('activities')">
+              <div class="report-template-icon">
+                <i class="fas fa-tasks"></i>
+              </div>
+              <h4>Activities Report</h4>
+              <p class="text-muted small">Chama activities and events</p>
+            </div>
+            
+            <div class="report-template-card" onclick="generateReport('communications')">
+              <div class="report-template-icon">
+                <i class="fas fa-bullhorn"></i>
+              </div>
+              <h4>Communications Report</h4>
+              <p class="text-muted small">Announcements and notifications</p>
+            </div>
+            
+            <div class="report-template-card" onclick="generateReport('custom')">
+              <div class="report-template-icon">
+                <i class="fas fa-cogs"></i>
+              </div>
+              <h4>Custom Report</h4>
+              <p class="text-muted small">Create custom report with filters</p>
+            </div>
+          </div>
+          
+          <!-- Report Parameters -->
+          <div class="secretary-card mt-4" id="reportParameters" style="display: none;">
+            <h4 id="reportTitle">Report Parameters</h4>
+            <form id="reportForm">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Report Period</label>
+                  <select class="form-select" id="reportPeriod">
+                    <option value="monthly">Monthly</option>
+                    <option value="quarterly">Quarterly</option>
+                    <option value="yearly">Yearly</option>
+                    <option value="custom">Custom Range</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Start Date</label>
+                  <input type="date" class="form-control" id="reportStartDate">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">End Date</label>
+                  <input type="date" class="form-control" id="reportEndDate">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Format</label>
+                <select class="form-select" id="reportFormat">
+                  <option value="pdf">PDF</option>
+                  <option value="excel">Excel</option>
+                  <option value="word">Word</option>
+                  <option value="html">HTML</option>
+                </select>
+              </div>
+              <div class="mt-4">
+                <button type="button" class="btn btn-primary" id="generateReportBtn">
+                  <i class="fas fa-file-pdf me-2"></i> Generate Report
+                </button>
+                <button type="button" class="btn btn-outline-secondary ms-2" id="previewReportBtn">
+                  <i class="fas fa-eye me-2"></i> Preview
+                </button>
+              </div>
+            </form>
+          </div>
+          
+          <!-- Generated Reports -->
+          <div class="secretary-table-container mt-4">
+            <div class="secretary-table-header">
+              <h3><i class="fas fa-history me-2"></i>Recently Generated Reports</h3>
+            </div>
+            <div class="table-responsive">
+              <table class="table secretary-table">
+                <thead>
+                  <tr>
+                    <th>Report Name</th>
+                    <th>Type</th>
+                    <th>Period</th>
+                    <th>Generated</th>
+                    <th>Size</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="generatedReportsTable">
+                  <!-- Filled by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Member Directory Page -->
+        <div id="directoryPage" class="page-content d-none">
+          <div class="mb-4">
+            <h2><i class="fas fa-address-book me-2"></i>Member Directory</h2>
+            <p class="text-muted">View and search chama member directory</p>
+          </div>
+          
+          <!-- Directory Search -->
+          <div class="secretary-card mb-4">
+            <div class="row">
+              <div class="col-md-8">
+                <div class="form-group">
+                  <label class="form-label">Search Members</label>
+                  <input type="text" class="form-control" id="directorySearch" placeholder="Search by name, email, phone, or ID...">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="form-label">Filter by Status</label>
+                  <select class="form-select" id="directoryStatusFilter">
+                    <option value="">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                    <option value="pending">Pending</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Member Directory -->
+          <div class="member-directory" id="memberDirectory">
+            <!-- Filled by JavaScript -->
+          </div>
+        </div>
+        
+        <!-- Calendar Page -->
+        <div id="calendarPage" class="page-content d-none">
+          <div class="mb-4">
+            <h2><i class="fas fa-calendar-week me-2"></i>Chama Calendar</h2>
+            <p class="text-muted">View and manage chama events and meetings</p>
+          </div>
+          
+          <!-- Calendar Controls -->
+          <div class="calendar-container">
+            <div class="calendar-header">
+              <h4 id="calendarMonth">February 2024</h4>
+              <div>
+                <button class="btn btn-sm btn-outline-secondary me-2" id="prevMonthBtn">
+                  <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-secondary" id="nextMonthBtn">
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+                <button class="btn btn-sm btn-primary ms-2" onclick="scheduleMeeting()">
+                  <i class="fas fa-plus me-1"></i> Add Event
+                </button>
+              </div>
+            </div>
+            
+            <div class="calendar-grid">
+              <!-- Calendar header -->
+              <div class="calendar-day">Sun</div>
+              <div class="calendar-day">Mon</div>
+              <div class="calendar-day">Tue</div>
+              <div class="calendar-day">Wed</div>
+              <div class="calendar-day">Thu</div>
+              <div class="calendar-day">Fri</div>
+              <div class="calendar-day">Sat</div>
+              
+              <!-- Calendar dates will be filled by JavaScript -->
+              <div id="calendarDates"></div>
+            </div>
+          </div>
+          
+          <!-- Upcoming Events -->
+          <div class="secretary-table-container mt-4">
+            <div class="secretary-table-header">
+              <h3><i class="fas fa-calendar-alt me-2"></i>Upcoming Events</h3>
+            </div>
+            <div class="table-responsive">
+              <table class="table secretary-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Event</th>
+                    <th>Type</th>
+                    <th>Time</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="upcomingEventsTable">
+                  <!-- Filled by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Settings Page -->
+        <div id="settingsPage" class="page-content d-none">
+          <div class="mb-4">
+            <h2><i class="fas fa-cog me-2"></i>Secretary Settings</h2>
+            <p class="text-muted">Configure secretary preferences and system settings</p>
+          </div>
+          
+          <!-- Settings Tabs -->
+          <ul class="nav nav-tabs mb-4" id="settingsTabs">
+            <li class="nav-item">
+              <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#meetingSettingsTab">Meeting Settings</button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#notificationSettingsTab">Notifications</button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#documentSettingsTab">Documents</button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#generalSettingsTab">General</button>
+            </li>
+          </ul>
+          
+          <div class="tab-content" id="settingsContent">
+            <!-- Meeting Settings -->
+            <div class="tab-pane fade show active" id="meetingSettingsTab">
+              <div class="secretary-card">
+                <h4>Meeting Settings</h4>
+                <form id="meetingSettingsForm">
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label class="form-label">Default Meeting Time</label>
+                      <input type="time" class="form-control" id="defaultMeetingTime" value="14:00">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Default Meeting Duration (hours)</label>
+                      <input type="number" class="form-control" id="defaultMeetingDuration" value="2">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Default Meeting Location</label>
+                      <input type="text" class="form-control" id="defaultMeetingLocation" placeholder="Chama meeting hall">
+                    </div>
+                  </div>
+                  
+                  <div class="form-group mt-3">
+                    <label class="form-label">Reminder Settings</label>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="sendMeetingReminders" checked>
+                      <label class="form-check-label" for="sendMeetingReminders">
+                        Send meeting reminders
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="sendAgendaBeforeMeeting" checked>
+                      <label class="form-check-label" for="sendAgendaBeforeMeeting">
+                        Send agenda 24 hours before meeting
+                      </label>
+                    </div>
+                  </div>
+                  
+                  <button type="submit" class="btn btn-primary mt-3">Save Settings</button>
+                </form>
+              </div>
+            </div>
+            
+            <!-- Other settings tabs would be similar -->
+          </div>
+        </div>
+        
+      </div>
+    </main>
+  </div>
+  
+  <!-- Modals -->
+  
+  <!-- Schedule Meeting Modal -->
+  <div class="modal fade" id="scheduleMeetingModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fas fa-calendar-plus me-2"></i>Schedule New Meeting</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="meetingScheduleForm">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Meeting Title *</label>
+                <input type="text" class="form-control" id="meetingTitle" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Meeting Date *</label>
+                <input type="date" class="form-control" id="meetingDate" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Start Time *</label>
+                <input type="time" class="form-control" id="meetingStartTime" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">End Time *</label>
+                <input type="time" class="form-control" id="meetingEndTime" required>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Meeting Location</label>
+              <input type="text" class="form-control" id="meetingLocation" placeholder="Physical or virtual meeting location">
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Meeting Type</label>
+              <select class="form-select" id="meetingType">
+                <option value="regular">Regular Meeting</option>
+                <option value="emergency">Emergency Meeting</option>
+                <option value="agm">Annual General Meeting</option>
+                <option value="special">Special Meeting</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Agenda</label>
+              <textarea class="form-control" id="meetingAgenda" rows="4" placeholder="Enter meeting agenda points..."></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Additional Notes</label>
+              <textarea class="form-control" id="meetingNotes" rows="2" placeholder="Any additional notes..."></textarea>
+            </div>
+            
+            <div class="form-group">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="sendInvitations" checked>
+                <label class="form-check-label" for="sendInvitations">
+                  Send meeting invitations to all members
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="setReminder" checked>
+                <label class="form-check-label" for="setReminder">
+                  Set reminder (24 hours before)
+                </label>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="saveMeetingBtn">Schedule Meeting</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Create Announcement Modal -->
+  <div class="modal fade" id="createAnnouncementModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fas fa-bullhorn me-2"></i>Create Announcement</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="announcementForm">
+            <div class="form-group">
+              <label class="form-label">Title *</label>
+              <input type="text" class="form-control" id="announcementTitle" required>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Message *</label>
+              <textarea class="form-control" id="announcementMessage" rows="6" required></textarea>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Priority</label>
+                <select class="form-select" id="announcementPriority">
+                  <option value="normal">Normal</option>
+                  <option value="high">High</option>
+                  <option value="urgent">Urgent</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Audience</label>
+                <select class="form-select" id="announcementAudience">
+                  <option value="all">All Members</option>
+                  <option value="active">Active Members Only</option>
+                  <option value="executive">Executive Committee Only</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="sendEmailNotification" checked>
+                <label class="form-check-label" for="sendEmailNotification">
+                  Send email notification
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="sendSMSNotification">
+                <label class="form-check-label" for="sendSMSNotification">
+                  Send SMS notification (if phone number available)
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="pinToTop">
+                <label class="form-check-label" for="pinToTop">
+                  Pin to top of announcements
+                </label>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="publishAnnouncementBtn">Publish Announcement</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Record Minutes Modal -->
+  <div class="modal fade" id="recordMinutesModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fas fa-clipboard me-2"></i>Record Meeting Minutes</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="minutes-editor">
+            <form id="minutesForm">
+              <!-- Minutes form will be filled by JavaScript -->
+            </form>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="saveMinutesBtn">Save Minutes</button>
+          <button type="button" class="btn btn-success" id="publishMinutesBtn">Publish Minutes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Custom JavaScript -->
+  <script type="module">
+    // Import Supabase configuration
+    import supabase from "./supabase/supabase.js";
+    
+    // Global state
+    let currentSecretary = null;
+    let secretaryProfile = null;
+    let currentPage = 'dashboard';
+    
+    // DOM Elements
+    const secretarySidebar = document.getElementById('secretarySidebar');
+    const secretarySidebarToggle = document.getElementById('secretarySidebarToggle');
+    const secretaryMobileMenuBtn = document.getElementById('secretaryMobileMenuBtn');
+    const secretaryMenuItems = document.querySelectorAll('.secretary-menu-item');
+    const pageContents = document.querySelectorAll('.page-content');
+    const secretaryPageTitle = document.getElementById('secretaryPageTitle');
+    const secretaryPageSubtitle = document.getElementById('secretaryPageSubtitle');
+    
+    // Initialize Secretary Dashboard
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        // Check authentication
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        if (authError || !user) {
+          window.location.href = 'login.html';
+          return;
+        }
+        
+        // Load secretary data
+        await loadSecretaryData(user);
+        
+        // Load initial page data
+        await switchPage('dashboard');
+        
+        // Setup event listeners
+        setupSecretaryEventListeners();
+        
+        // Initialize secretary dashboard
+        initializeSecretaryDashboard();
+        
+      } catch (error) {
+        console.error('Secretary dashboard initialization error:', error);
+        showSecretaryError('Error loading dashboard. Please try again.');
+      }
+    });
+    
+    // Load Secretary Data
+    async function loadSecretaryData(user) {
+      try {
+        // Get secretary profile
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+        
+        if (profileError) throw profileError;
+        
+        if (!profile) {
+          await supabase.auth.signOut();
+          window.location.href = 'login.html';
+          return;
+        }
+        
+        // Check if user is a secretary
+        if (profile.role !== 'secretary') {
+          // Redirect to appropriate dashboard
+          window.location.href = `dashboards/${profile.role}/dashboard.html`;
+          return;
+        }
+        
+        secretaryProfile = profile;
+        currentSecretary = profile;
+        
+        // Update UI with secretary info
+        updateSecretaryUI();
+        
+      } catch (error) {
+        console.error('Error loading secretary data:', error);
+        throw error;
+      }
+    }
+    
+    // Update Secretary UI
+    function updateSecretaryUI() {
+      if (!currentSecretary) return;
+      
+      // Update avatar with initial
+      const avatar = document.getElementById('secretaryAvatar');
+      if (avatar) {
+        avatar.innerHTML = currentSecretary.full_name.charAt(0).toUpperCase();
+      }
+      
+      // Update name fields
+      document.getElementById('secretaryFullName').textContent = currentSecretary.full_name;
+      document.getElementById('welcomeSecretaryName').textContent = currentSecretary.full_name.split(' ')[0];
+    }
+    
+    // Switch Page Function
+    async function switchPage(page) {
+      currentPage = page;
+      
+      // Hide all pages
+      pageContents.forEach(p => p.classList.add('d-none'));
+      
+      // Show selected page
+      const pageElement = document.getElementById(`${page}Page`);
+      if (!pageElement) {
+        console.error(`Page ${page} not found`);
+        return;
+      }
+      
+      pageElement.classList.remove('d-none');
+      
+      // Update page title and subtitle
+      updateSecretaryPageTitle(page);
+      
+      // Load page-specific data
+      await loadSecretaryPageData(page);
+      
+      // Update active menu item
+      updateActiveSecretaryMenuItem(page);
+    }
+    
+    // Update Secretary Page Title
+    function updateSecretaryPageTitle(page) {
+      const pageTitles = {
+        dashboard: { title: 'Secretary Dashboard', subtitle: 'Manage records, meetings, and communications' },
+        members: { title: 'Member Registration', subtitle: 'Register and manage chama members' },
+        meetings: { title: 'Meetings & Minutes', subtitle: 'Schedule meetings and record minutes' },
+        attendance: { title: 'Attendance Management', subtitle: 'Take attendance and view records' },
+        communications: { title: 'Communications Center', subtitle: 'Send announcements and communicate' },
+        documents: { title: 'Document Management', subtitle: 'Store and manage chama documents' },
+        reports: { title: 'Reports & Analytics', subtitle: 'Generate and view chama reports' },
+        directory: { title: 'Member Directory', subtitle: 'View and search member directory' },
+        calendar: { title: 'Chama Calendar', subtitle: 'View and manage chama events' },
+        settings: { title: 'Secretary Settings', subtitle: 'Configure preferences and settings' }
+      };
+      
+      const pageInfo = pageTitles[page] || { 
+        title: page.charAt(0).toUpperCase() + page.slice(1), 
+        subtitle: '' 
+      };
+      
+      secretaryPageTitle.textContent = pageInfo.title;
+      secretaryPageSubtitle.textContent = pageInfo.subtitle;
+    }
+    
+    // Update Active Menu Item
+    function updateActiveSecretaryMenuItem(page) {
+      secretaryMenuItems.forEach(item => {
+        item.classList.remove('active');
+        if (item.getAttribute('data-page') === page) {
+          item.classList.add('active');
+        }
+      });
+    }
+    
+    // Load Secretary Page Data
+    async function loadSecretaryPageData(page) {
+      try {
+        switch(page) {
+          case 'dashboard':
+            await loadSecretaryDashboardData();
+            break;
+          case 'members':
+            await loadMemberRegistrationData();
+            break;
+          case 'meetings':
+            await loadMeetingsData();
+            break;
+          case 'attendance':
+            await loadAttendanceData();
+            break;
+          case 'communications':
+            await loadCommunicationsData();
+            break;
+          case 'documents':
+            await loadDocumentsData();
+            break;
+          case 'reports':
+            await loadReportsData();
+            break;
+          case 'directory':
+            await loadDirectoryData();
+            break;
+          case 'calendar':
+            await loadCalendarData();
+            break;
+          case 'settings':
+            await loadSettingsData();
+            break;
+          default:
+            console.log(`No data loader for ${page}`);
+        }
+      } catch (error) {
+        console.error(`Error loading ${page} data:`, error);
+        showSecretaryError(`Failed to load ${page} data`);
+      }
+    }
+    
+    // Load Secretary Dashboard Data
+    async function loadSecretaryDashboardData() {
+      try {
+        // Load total members count
+        const { count: totalMembers, error: membersError } = await supabase
+          .from('profiles')
+          .select('*', { count: 'exact', head: true });
+        
+        if (!membersError) {
+          document.getElementById('totalMembersCount').textContent = totalMembers || 0;
+          document.getElementById('quickMembersCount').textContent = totalMembers || 0;
+          
+          // Load active members
+          const { count: activeMembers, error: activeError } = await supabase
+            .from('profiles')
+            .select('*', { count: 'exact', head: true })
+            .eq('is_active', true);
+          
+          if (!activeError) {
+            document.getElementById('activeMembersCount').textContent = activeMembers || 0;
+          }
+        }
+        
+        // Load upcoming meetings
+        const today = new Date().toISOString().split('T')[0];
+        const { data: upcomingMeetings, error: meetingsError } = await supabase
+          .from('meetings')
+          .select('*')
+          .gte('meeting_date', today)
+          .order('meeting_date', { ascending: true })
+          .limit(5);
+        
+        if (!meetingsError) {
+          document.getElementById('upcomingMeetingsCount').textContent = upcomingMeetings?.length || 0;
+          document.getElementById('upcomingMeetings').textContent = upcomingMeetings?.length || 0;
+          document.getElementById('quickMeetingsCount').textContent = upcomingMeetings?.length || 0;
+          
+          if (upcomingMeetings && upcomingMeetings.length > 0) {
+            const nextMeeting = upcomingMeetings[0];
+            document.getElementById('nextMeetingDate').textContent = new Date(nextMeeting.meeting_date).toLocaleDateString();
+          }
+        }
+        
+        // Load total announcements
+        const { count: totalAnnouncements, error: announcementsError } = await supabase
+          .from('announcements')
+          .select('*', { count: 'exact', head: true });
+        
+        if (!announcementsError) {
+          document.getElementById('totalAnnouncements').textContent = totalAnnouncements || 0;
+        }
+        
+        // Load recent activities
+        await loadRecentActivities();
+        
+        // Load today's agenda
+        await loadTodaysAgenda();
+        
+      } catch (error) {
+        console.error('Error loading secretary dashboard data:', error);
+        throw error;
+      }
+    }
+    
+    // Load Member Registration Data
+    async function loadMemberRegistrationData() {
+      try {
+        // Load all members with their details
+        const { data: members, error } = await supabase
+          .from('profiles')
+          .select(`
+            *,
+            members!inner (
+              membership_no,
+              join_date,
+              status
+            )
+          `)
+          .order('full_name');
+        
+        if (error) throw error;
+        
+        // Count pending registrations (inactive members)
+        const pendingRegistrations = members.filter(m => !m.is_active).length;
+        document.getElementById('pendingRegistrations').textContent = pendingRegistrations;
+        
+        // Update members table
+        const tableBody = document.getElementById('membersManagementTable');
+        if (tableBody) {
+          tableBody.innerHTML = members.map(member => {
+            const memberData = member.members?.[0] || {};
+            const status = member.is_active ? 'active' : memberData.status || 'pending';
+            
+            return `
+              <tr>
+                <td>${memberData.membership_no || 'N/A'}</td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div class="avatar-sm me-2">
+                      <div class="avatar-title bg-primary rounded-circle text-white" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+                        ${member.full_name.charAt(0).toUpperCase()}
+                      </div>
+                    </div>
+                    <div>
+                      <strong>${member.full_name}</strong><br>
+                      <small class="text-muted">${member.role}</small>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div>${member.email}</div>
+                  <small class="text-muted">${member.phone || 'No phone'}</small>
+                </td>
+                <td><span class="badge bg-info">${member.role}</span></td>
+                <td>
+                  <span class="secretary-status-badge ${status === 'active' ? 'status-registered' : 'status-pending-approval'}">
+                    ${status === 'active' ? 'Active' : 'Pending'}
+                  </span>
+                </td>
+                <td>${memberData.join_date ? new Date(memberData.join_date).toLocaleDateString() : 'N/A'}</td>
+                <td>${new Date(member.created_at).toLocaleDateString()}</td>
+                <td>
+                  <button class="secretary-action-btn" onclick="viewMemberDetails('${member.id}')" title="View">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  <button class="secretary-action-btn btn-register" onclick="editMember('${member.id}')" title="Edit">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  ${!member.is_active ? `
+                    <button class="secretary-action-btn btn-schedule" onclick="approveMember('${member.id}')" title="Approve">
+                      <i class="fas fa-check"></i>
+                    </button>
+                  ` : ''}
+                </td>
+              </tr>
+            `;
+          }).join('');
+        }
+        
+      } catch (error) {
+        console.error('Error loading member registration data:', error);
+        showSecretaryError('Failed to load member data');
+      }
+    }
+    
+    // Load Meetings Data
+    async function loadMeetingsData() {
+      try {
+        const today = new Date().toISOString().split('T')[0];
+        
+        // Load upcoming meetings
+        const { data: upcomingMeetings, error: upcomingError } = await supabase
+          .from('meetings')
+          .select('*')
+          .gte('meeting_date', today)
+          .order('meeting_date', { ascending: true });
+        
+        if (upcomingError) throw upcomingError;
+        
+        // Update upcoming meetings list
+        const upcomingList = document.getElementById('upcomingMeetingsList');
+        if (upcomingList) {
+          if (!upcomingMeetings || upcomingMeetings.length === 0) {
+            upcomingList.innerHTML = `
+              <div class="secretary-empty-state">
+                <i class="fas fa-calendar-plus"></i>
+                <h4>No Upcoming Meetings</h4>
+                <p>Schedule a meeting to get started.</p>
+                <button class="btn btn-primary mt-3" onclick="scheduleMeeting()">
+                  <i class="fas fa-calendar-plus me-2"></i>Schedule Meeting
+                </button>
+              </div>
+            `;
+          } else {
+            upcomingList.innerHTML = upcomingMeetings.map(meeting => `
+              <div class="meeting-card">
+                <div class="meeting-card-header">
+                  <h5 class="meeting-title">${meeting.agenda || 'Meeting'}</h5>
+                  <span class="secretary-status-badge status-scheduled">Scheduled</span>
+                </div>
+                
+                <div class="meeting-details">
+                  <div class="meeting-detail-item">
+                    <span class="meeting-detail-label">Date</span>
+                    <span class="meeting-detail-value">${new Date(meeting.meeting_date).toLocaleDateString()}</span>
+                  </div>
+                  <div class="meeting-detail-item">
+                    <span class="meeting-detail-label">Time</span>
+                    <span class="meeting-detail-value">${meeting.start_time || '14:00'}</span>
+                  </div>
+                  <div class="meeting-detail-item">
+                    <span class="meeting-detail-label">Location</span>
+                    <span class="meeting-detail-value">${meeting.location || 'Not specified'}</span>
+                  </div>
+                  <div class="meeting-detail-item">
+                    <span class="meeting-detail-label">Type</span>
+                    <span class="meeting-detail-value">${meeting.meeting_type || 'Regular'}</span>
+                  </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <small class="text-muted">
+                      Recorded by: ${meeting.recorded_by || 'Secretary'}
+                    </small>
+                  </div>
+                  <div>
+                    <button class="secretary-action-btn btn-schedule" onclick="recordMinutes(${meeting.id})">
+                      <i class="fas fa-clipboard me-1"></i> Record Minutes
+                    </button>
+                    <button class="secretary-action-btn" onclick="viewMeetingDetails(${meeting.id})">
+                      <i class="fas fa-eye me-1"></i> View
+                    </button>
+                    <button class="secretary-action-btn" onclick="editMeeting(${meeting.id})">
+                      <i class="fas fa-edit me-1"></i> Edit
+                    </button>
+                  </div>
+                </div>
+              </div>
+            `).join('');
+          }
+        }
+        
+        // Update upcoming tab count
+        document.getElementById('upcomingTabCount').textContent = upcomingMeetings?.length || 0;
+        
+        // Load past meetings
+        const { data: pastMeetings, error: pastError } = await supabase
+          .from('meetings')
+          .select('*')
+          .lt('meeting_date', today)
+          .order('meeting_date', { ascending: false })
+          .limit(10);
+        
+        if (!pastError && pastMeetings) {
+          const pastList = document.getElementById('pastMeetingsList');
+          if (pastList) {
+            pastList.innerHTML = pastMeetings.map(meeting => `
+              <div class="meeting-card">
+                <div class="meeting-card-header">
+                  <h5 class="meeting-title">${meeting.agenda || 'Meeting'}</h5>
+                  <span class="secretary-status-badge status-completed">Completed</span>
+                </div>
+                <p class="text-muted mb-3">${new Date(meeting.meeting_date).toLocaleDateString()} • ${meeting.minutes ? 'Minutes recorded' : 'No minutes'}</p>
+                <div class="d-flex justify-content-end">
+                  ${meeting.minutes ? `
+                    <button class="secretary-action-btn" onclick="viewMinutes(${meeting.id})">
+                      <i class="fas fa-file-alt me-1"></i> View Minutes
+                    </button>
+                  ` : `
+                    <button class="secretary-action-btn btn-schedule" onclick="recordMinutes(${meeting.id})">
+                      <i class="fas fa-clipboard me-1"></i> Record Minutes
+                    </button>
+                  `}
+                </div>
+              </div>
+            `).join('');
+          }
+        }
+        
+      } catch (error) {
+        console.error('Error loading meetings data:', error);
+        showSecretaryError('Failed to load meetings data');
+      }
+    }
+    
+    // Load Attendance Data
+    async function loadAttendanceData() {
+      try {
+        // Load meetings for attendance selection
+        const today = new Date().toISOString().split('T')[0];
+        const { data: meetings, error: meetingsError } = await supabase
+          .from('meetings')
+          .select('id, meeting_date, agenda')
+          .order('meeting_date', { ascending: false })
+          .limit(10);
+        
+        if (!meetingsError && meetings) {
+          const meetingSelect = document.getElementById('attendanceMeetingSelect');
+          if (meetingSelect) {
+            meetingSelect.innerHTML = '<option value="">Select Meeting</option>' +
+              meetings.map(meeting => `
+                <option value="${meeting.id}">
+                  ${new Date(meeting.meeting_date).toLocaleDateString()} - ${meeting.agenda?.substring(0, 50) || 'Meeting'}
+                </option>
+              `).join('');
+          }
+        }
+        
+        // Load attendance history
+        await loadAttendanceHistory();
+        
+      } catch (error) {
+        console.error('Error loading attendance data:', error);
+        showSecretaryError('Failed to load attendance data');
+      }
+    }
+    
+    // Load Communications Data
+    async function loadCommunicationsData() {
+      try {
+        // Load announcements
+        const { data: announcements, error } = await supabase
+          .from('announcements')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(20);
+        
+        if (error) throw error;
+        
+        const announcementsList = document.getElementById('announcementsList');
+        if (announcementsList) {
+          announcementsList.innerHTML = announcements.map(announcement => `
+            <div class="announcement-card">
+              <div class="announcement-card-header">
+                <div>
+                  <h5 class="announcement-title">${announcement.title}</h5>
+                  <div class="announcement-meta">
+                    <i class="fas fa-calendar me-1"></i> ${new Date(announcement.created_at).toLocaleString()}
+                    <span class="ms-3"><i class="fas fa-user me-1"></i> ${announcement.posted_by || 'Secretary'}</span>
+                  </div>
+                </div>
+                <span class="badge ${announcement.priority === 'urgent' ? 'bg-danger' : announcement.priority === 'high' ? 'bg-warning' : 'bg-info'}">
+                  ${announcement.priority || 'normal'}
+                </span>
+              </div>
+              
+              <div class="announcement-content">
+                ${announcement.message}
+              </div>
+              
+              <div class="d-flex justify-content-between align-items-center">
+                <small class="text-muted">
+                  <i class="fas fa-users me-1"></i>
+                  Sent to: ${announcement.audience || 'All members'}
+                </small>
+                <div>
+                  <button class="secretary-action-btn" onclick="editAnnouncement(${announcement.id})">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="secretary-action-btn" onclick="deleteAnnouncement(${announcement.id})">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          `).join('');
+        }
+        
+      } catch (error) {
+        console.error('Error loading communications data:', error);
+        showSecretaryError('Failed to load communications data');
+      }
+    }
+    
+    // Helper Functions
+    async function loadRecentActivities() {
+      try {
+        // Combine various activities
+        const activities = [];
+        
+        // Load recent meetings
+        const { data: recentMeetings, error: meetingsError } = await supabase
+          .from('meetings')
+          .select('meeting_date, agenda, created_at')
+          .order('created_at', { ascending: false })
+          .limit(5);
+        
+        if (!meetingsError && recentMeetings) {
+          recentMeetings.forEach(meeting => {
+            activities.push({
+              date: meeting.created_at,
+              activity: 'Meeting Scheduled',
+              type: 'Meeting',
+              details: meeting.agenda || 'Meeting',
+              recordedBy: 'Secretary'
+            });
+          });
+        }
+        
+        // Load recent announcements
+        const { data: recentAnnouncements, error: announcementsError } = await supabase
+          .from('announcements')
+          .select('title, created_at')
+          .order('created_at', { ascending: false })
+          .limit(5);
+        
+        if (!announcementsError && recentAnnouncements) {
+          recentAnnouncements.forEach(announcement => {
+            activities.push({
+              date: announcement.created_at,
+              activity: 'Announcement Published',
+              type: 'Communication',
+              details: announcement.title,
+              recordedBy: 'Secretary'
+            });
+          });
+        }
+        
+        // Sort by date and take top 10
+        activities.sort((a, b) => new Date(b.date) - new Date(a.date));
+        const recentActivities = activities.slice(0, 10);
+        
+        // Update table
+        const tableBody = document.getElementById('recentActivitiesTable');
+        if (tableBody) {
+          tableBody.innerHTML = recentActivities.map(activity => `
+            <tr>
+              <td>${new Date(activity.date).toLocaleDateString()}</td>
+              <td>${activity.activity}</td>
+              <td><span class="badge ${activity.type === 'Meeting' ? 'bg-primary' : 'bg-success'}">${activity.type}</span></td>
+              <td>${activity.details}</td>
+              <td>${activity.recordedBy}</td>
+            </tr>
+          `).join('');
+        }
+        
+      } catch (error) {
+        console.error('Error loading recent activities:', error);
+      }
+    }
+    
+    async function loadTodaysAgenda() {
+      const today = new Date().toISOString().split('T')[0];
+      
+      try {
+        const { data: todaysMeetings, error } = await supabase
+          .from('meetings')
+          .select('*')
+          .eq('meeting_date', today);
+        
+        const agendaContainer = document.getElementById('todaysAgenda');
+        if (agendaContainer) {
+          if (!todaysMeetings || todaysMeetings.length === 0) {
+            agendaContainer.innerHTML = `
+              <div class="text-center text-muted py-4">
+                <i class="fas fa-calendar-day fa-2x mb-3"></i>
+                <p>No meetings scheduled for today</p>
+              </div>
+            `;
+          } else {
+            agendaContainer.innerHTML = todaysMeetings.map(meeting => `
+              <div class="alert alert-info">
+                <h6><i class="fas fa-calendar-check me-2"></i>${meeting.agenda || 'Meeting'}</h6>
+                <p class="mb-1"><small>Time: ${meeting.start_time || '14:00'} - ${meeting.end_time || '16:00'}</small></p>
+                <p class="mb-1"><small>Location: ${meeting.location || 'Not specified'}</small></p>
+                <button class="btn btn-sm btn-outline-info mt-2" onclick="viewMeetingDetails(${meeting.id})">
+                  <i class="fas fa-info-circle me-1"></i> Details
+                </button>
+              </div>
+            `).join('');
+          }
+        }
+        
+      } catch (error) {
+        console.error('Error loading today\'s agenda:', error);
+      }
+    }
+    
+    async function loadAttendanceHistory() {
+      try {
+        const { data: meetingsWithAttendance, error } = await supabase
+          .from('meetings')
+          .select(`
+            *,
+            attendance:meeting_attendance(count)
+          `)
+          .order('meeting_date', { ascending: false })
+          .limit(10);
+        
+        if (error) throw error;
+        
+        const tableBody = document.getElementById('attendanceHistoryTable');
+        if (tableBody) {
+          if (!meetingsWithAttendance || meetingsWithAttendance.length === 0) {
+            tableBody.innerHTML = `
+              <tr>
+                <td colspan="7" class="text-center py-4 text-muted">
+                  <i class="fas fa-calendar-times me-2"></i>
+                  No attendance records found
+                </td>
+              </tr>
+            `;
+          } else {
+            // In a real application, you would have actual attendance data
+            // This is a placeholder implementation
+            tableBody.innerHTML = meetingsWithAttendance.map(meeting => `
+              <tr>
+                <td>${new Date(meeting.meeting_date).toLocaleDateString()}</td>
+                <td>${meeting.agenda?.substring(0, 50) || 'Meeting'}</td>
+                <td>${meeting.attendance?.[0]?.count || 0}</td>
+                <td>${15 - (meeting.attendance?.[0]?.count || 0)}</td>
+                <td>${Math.round(((meeting.attendance?.[0]?.count || 0) / 15) * 100)}%</td>
+                <td>Secretary</td>
+                <td>
+                  <button class="secretary-action-btn" onclick="viewAttendance(${meeting.id})">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </td>
+              </tr>
+            `).join('');
+          }
+        }
+        
+      } catch (error) {
+        console.error('Error loading attendance history:', error);
+      }
+    }
+    
+    // Action Functions
+    window.scheduleMeeting = function() {
+      const modal = new bootstrap.Modal(document.getElementById('scheduleMeetingModal'));
+      modal.show();
+    };
+    
+    window.createAnnouncement = function() {
+      const modal = new bootstrap.Modal(document.getElementById('createAnnouncementModal'));
+      modal.show();
+    };
+    
+    window.recordMinutes = function(meetingId) {
+      // Load meeting details and show minutes modal
+      const modal = new bootstrap.Modal(document.getElementById('recordMinutesModal'));
+      modal.show();
+      
+      // In a real application, you would load the meeting details here
+      console.log('Recording minutes for meeting:', meetingId);
+    };
+    
+    window.viewMemberDetails = async function(memberId) {
+      try {
+        const { data: member, error } = await supabase
+          .from('profiles')
+          .select(`
+            *,
+            members!inner(*)
+          `)
+          .eq('id', memberId)
+          .single();
+        
+        if (error) throw error;
+        
+        // Show member details in a modal or dedicated view
+        alert(`Member Details:\nName: ${member.full_name}\nEmail: ${member.email}\nPhone: ${member.phone || 'N/A'}\nRole: ${member.role}`);
+        
+      } catch (error) {
+        console.error('Error viewing member details:', error);
+        showSecretaryError('Failed to load member details');
+      }
+    };
+    
+    window.editMember = function(memberId) {
+      // Show edit member form
+      document.getElementById('registrationFormContainer').style.display = 'block';
+      // Scroll to form
+      document.getElementById('registrationFormContainer').scrollIntoView({ behavior: 'smooth' });
+      // In a real application, you would load the member data into the form
+      console.log('Editing member:', memberId);
+    };
+    
+    window.approveMember = async function(memberId) {
+      try {
+        const confirmation = confirm('Are you sure you want to approve this member?');
+        if (!confirmation) return;
+        
+        const { error } = await supabase
+          .from('profiles')
+          .update({ is_active: true })
+          .eq('id', memberId);
+        
+        if (error) throw error;
+        
+        showSecretarySuccess('Member approved successfully');
+        
+        // Refresh data
+        await loadMemberRegistrationData();
+        await loadSecretaryDashboardData();
+        
+      } catch (error) {
+        console.error('Error approving member:', error);
+        showSecretaryError('Failed to approve member');
+      }
+    };
+    
+    window.generateReport = function(reportType) {
+      // Show report parameters
+      const reportParams = document.getElementById('reportParameters');
+      const reportTitle = document.getElementById('reportTitle');
+      
+      const reportTitles = {
+        attendance: 'Attendance Report Parameters',
+        membership: 'Membership Report Parameters',
+        meetings: 'Meetings Report Parameters',
+        activities: 'Activities Report Parameters',
+        communications: 'Communications Report Parameters',
+        custom: 'Custom Report Parameters'
+      };
+      
+      reportTitle.textContent = reportTitles[reportType] || 'Report Parameters';
+      reportParams.style.display = 'block';
+      
+      // Scroll to parameters
+      reportParams.scrollIntoView({ behavior: 'smooth' });
+    };
+    
+    window.useTemplate = function(templateType) {
+      // Use meeting template
+      scheduleMeeting();
+      // In a real application, you would pre-fill the meeting form with template data
+      console.log('Using template:', templateType);
+    };
+    
+    // Setup Event Listeners
+    function setupSecretaryEventListeners() {
+      // Sidebar toggle
+      if (secretarySidebarToggle) {
+        secretarySidebarToggle.addEventListener('click', () => {
+          secretarySidebar.classList.toggle('collapsed');
+          const icon = secretarySidebarToggle.querySelector('i');
+          icon.classList.toggle('fa-chevron-left');
+          icon.classList.toggle('fa-chevron-right');
+        });
+      }
+      
+      // Mobile menu toggle
+      if (secretaryMobileMenuBtn) {
+        secretaryMobileMenuBtn.addEventListener('click', () => {
+          secretarySidebar.classList.toggle('mobile-open');
+        });
+      }
+      
+      // Menu item clicks
+      secretaryMenuItems.forEach(item => {
+        item.addEventListener('click', async (e) => {
+          e.preventDefault();
+          const page = item.getAttribute('data-page');
+          if (page) {
+            await switchPage(page);
+          }
+        });
+      });
+      
+      // Communication tabs
+      document.querySelectorAll('.communication-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+          const target = this.getAttribute('data-target');
+          
+          // Update active tab
+          document.querySelectorAll('.communication-tab').forEach(t => t.classList.remove('active'));
+          this.classList.add('active');
+          
+          // Show corresponding content
+          document.querySelectorAll('.communication-tab-content').forEach(content => {
+            content.style.display = 'none';
+            content.classList.remove('active');
+          });
+          
+          const targetContent = document.getElementById(`${target}Tab`);
+          if (targetContent) {
+            targetContent.style.display = 'block';
+            targetContent.classList.add('active');
+          }
+        });
+      });
+      
+      // Add member button
+      document.getElementById('addMemberBtn')?.addEventListener('click', () => {
+        document.getElementById('registrationFormContainer').style.display = 'block';
+        document.getElementById('registrationFormContainer').scrollIntoView({ behavior: 'smooth' });
+      });
+      
+      // Cancel registration button
+      document.getElementById('cancelRegistrationBtn')?.addEventListener('click', () => {
+        document.getElementById('registrationFormContainer').style.display = 'none';
+        document.getElementById('memberRegistrationForm').reset();
+      });
+      
+      // Schedule meeting button
+      document.getElementById('scheduleMeetingBtn')?.addEventListener('click', scheduleMeeting);
+      
+      // Save meeting button
+      document.getElementById('saveMeetingBtn')?.addEventListener('click', async () => {
+        await saveMeeting();
+      });
+      
+      // Publish announcement button
+      document.getElementById('publishAnnouncementBtn')?.addEventListener('click', async () => {
+        await publishAnnouncement();
+      });
+      
+      // New announcement button
+      document.getElementById('newAnnouncementBtn')?.addEventListener('click', createAnnouncement);
+      
+      // Register member button
+      document.getElementById('registerMemberBtn')?.addEventListener('click', () => {
+        document.getElementById('registrationFormContainer').style.display = 'block';
+        document.getElementById('registrationFormContainer').scrollIntoView({ behavior: 'smooth' });
+      });
+      
+      // Logout button
+      document.getElementById('secretaryLogoutBtn')?.addEventListener('click', logoutSecretary);
+      
+      // Close mobile menu when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!secretarySidebar.contains(e.target) && !secretaryMobileMenuBtn.contains(e.target)) {
+          secretarySidebar.classList.remove('mobile-open');
+        }
+      });
+    }
+    
+    // Action Functions
+    async function saveMeeting() {
+      try {
+        const title = document.getElementById('meetingTitle').value;
+        const date = document.getElementById('meetingDate').value;
+        const startTime = document.getElementById('meetingStartTime').value;
+        const endTime = document.getElementById('meetingEndTime').value;
+        const location = document.getElementById('meetingLocation').value;
+        const type = document.getElementById('meetingType').value;
+        const agenda = document.getElementById('meetingAgenda').value;
+        const notes = document.getElementById('meetingNotes').value;
+        
+        if (!title || !date || !startTime || !endTime) {
+          showSecretaryError('Please fill all required fields');
+          return;
+        }
+        
+        const { error } = await supabase
+          .from('meetings')
+          .insert({
+            meeting_date: date,
+            agenda: title,
+            start_time: startTime,
+            end_time: endTime,
+            location: location,
+            meeting_type: type,
+            minutes: null,
+            recorded_by: currentSecretary.id,
+            additional_notes: notes
+          });
+        
+        if (error) throw error;
+        
+        showSecretarySuccess('Meeting scheduled successfully!');
+        
+        // Close modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('scheduleMeetingModal'));
+        modal.hide();
+        
+        // Reset form
+        document.getElementById('meetingScheduleForm').reset();
+        
+        // Refresh data
+        await loadMeetingsData();
+        await loadSecretaryDashboardData();
+        
+      } catch (error) {
+        console.error('Error scheduling meeting:', error);
+        showSecretaryError('Failed to schedule meeting');
+      }
+    }
+    
+    async function publishAnnouncement() {
+      try {
+        const title = document.getElementById('announcementTitle').value;
+        const message = document.getElementById('announcementMessage').value;
+        const priority = document.getElementById('announcementPriority').value;
+        const audience = document.getElementById('announcementAudience').value;
+        
+        if (!title || !message) {
+          showSecretaryError('Please fill all required fields');
+          return;
+        }
+        
+        const { error } = await supabase
+          .from('announcements')
+          .insert({
+            title: title,
+            message: message,
+            priority: priority,
+            audience: audience,
+            posted_by: currentSecretary.id
+          });
+        
+        if (error) throw error;
+        
+        showSecretarySuccess('Announcement published successfully!');
+        
+        // Close modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('createAnnouncementModal'));
+        modal.hide();
+        
+        // Reset form
+        document.getElementById('announcementForm').reset();
+        
+        // Refresh data
+        await loadCommunicationsData();
+        await loadSecretaryDashboardData();
+        
+      } catch (error) {
+        console.error('Error publishing announcement:', error);
+        showSecretaryError('Failed to publish announcement');
+      }
+    }
+    
+    function saveQuickNotes() {
+      const notes = document.getElementById('quickNotes').value;
+      localStorage.setItem('secretary_quick_notes', notes);
+      showSecretarySuccess('Notes saved locally');
+    }
+    
+    // Load quick notes from localStorage
+    function loadQuickNotes() {
+      const savedNotes = localStorage.getItem('secretary_quick_notes');
+      if (savedNotes) {
+        document.getElementById('quickNotes').value = savedNotes;
+      }
+    }
+    
+    // Other page data loaders (simplified for brevity)
+    async function loadDocumentsData() {
+      // Load documents data
+    }
+    
+    async function loadReportsData() {
+      // Load reports data
+    }
+    
+    async function loadDirectoryData() {
+      // Load directory data
+    }
+    
+    async function loadCalendarData() {
+      // Load calendar data
+    }
+    
+    async function loadSettingsData() {
+      // Load settings data
+    }
+    
+    function initializeSecretaryDashboard() {
+      // Initialize any dashboard-specific functionality
+      console.log('Secretary dashboard initialized');
+      loadQuickNotes();
+    }
+    
+    // Show Success Message
+    function showSecretarySuccess(message) {
+      // You can implement a toast notification
+      alert(message); // Temporary
+    }
+    
+    // Show Error Message
+    function showSecretaryError(message) {
+      // You can implement a toast notification
+      alert(message); // Temporary
+    }
+    
+    // Logout Function
+    async function logoutSecretary() {
+      try {
+        await supabase.auth.signOut();
+        window.location.href = 'login.html';
+      } catch (error) {
+        console.error('Error logging out:', error);
+        showSecretaryError('Logout failed. Please try again.');
+      }
+    }
+    
+    // Make functions available globally
+    window.switchPage = switchPage;
+    window.scheduleMeeting = scheduleMeeting;
+    window.createAnnouncement = createAnnouncement;
+    window.logoutSecretary = logoutSecretary;
+    
+  </script>
+</body>
+</html>

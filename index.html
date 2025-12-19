@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | Chama Management Suite</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="index.css">
+</head>
+
+<body class="bg-light">
+  <div class="container mt-5">
+    <div class="row justify-content-center align-items-center" style="min-height: 80vh;">
+      <div class="col-md-5">
+
+        <!-- Chama Title -->
+        <div class="chama-title mb-4">
+          <i class="fas fa-users me-2"></i>Chama<span>Suite</span>
+        </div>
+
+        <div class="auth-container">
+          <div class="auth-card">
+            <div class="auth-header">
+              <h4><i class="fas fa-sign-in-alt me-2"></i>Welcome Back</h4>
+              <p>Sign in to your Chama Management account</p>
+            </div>
+
+            <div class="card-body p-4">
+              <form id="loginForm" novalidate>
+
+                <!-- Email Input -->
+                <div class="input-group">
+                  <label for="email" class="form-label">Email Address</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                    <input type="email" class="form-control" id="email" placeholder="Enter your email" required>
+                  </div>
+                  <div class="validation-message text-danger" id="emailError"></div>
+                </div>
+
+                <!-- Password Input -->
+                <div class="input-group">
+                  <label for="password" class="form-label">Password</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                    <input type="password" class="form-control" id="password" placeholder="Enter your password"
+                      required>
+                    <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </div>
+                  <div class="validation-message text-danger" id="passwordError"></div>
+                </div>
+
+                <!-- Remember Me & Forgot Password -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="rememberMe">
+                    <label class="form-check-label" for="rememberMe">Remember me</label>
+                  </div>
+                  <a href="#" class="text-decoration-none" id="forgotPassword">Forgot password?</a>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-success w-100 mb-3" id="loginBtn">
+                  <i class="fas fa-sign-in-alt me-2"></i>Login
+                </button>
+
+                <!-- Loading Spinner (hidden by default) -->
+                <div class="text-center d-none" id="loadingSpinner">
+                  <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                  <p class="mt-2">Signing in...</p>
+                </div>
+
+              </form>
+
+              <!-- Error Alert (hidden by default) -->
+              <div class="alert alert-danger d-none mt-3" id="errorAlert" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <span id="errorMessage"></span>
+              </div>
+
+              <!-- Divider -->
+              <div class="text-center my-4 position-relative">
+                <hr>
+                <span class="bg-white px-3 position-absolute top-50 start-50 translate-middle">or</span>
+              </div>
+
+              <!-- Registration Link -->
+              <div class="auth-footer">
+                <p>Don't have an account? <a href="registration.html">Register here</a></p>
+                <p class="small text-muted mt-2">
+                  <i class="fas fa-info-circle me-1"></i>
+                  Different roles have different dashboard access
+                </p>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Footer Note -->
+          <div class="text-center mt-4">
+            <p class="text-muted small">
+              <i class="fas fa-shield-alt me-1"></i>
+              Secure login with Supabase authentication
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-fbbOQedDgZZwE9UoFq+8FZ5lR5p5F5I5J5l5f5J5J5l5f5J5l5f5J5l5f5J5l5f5"
+    crossorigin="anonymous"></script>
+
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script type="module">
+    import { loginUser } from "./supabase/auth.js";
+    import supabase from "./supabase/supabase.js";
+
+    // DOM Elements
+    const loginForm = document.getElementById('loginForm');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const togglePasswordBtn = document.getElementById('togglePassword');
+    const loginBtn = document.getElementById('loginBtn');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const errorAlert = document.getElementById('errorAlert');
+    const errorMessage = document.getElementById('errorMessage');
+    const emailError = document.getElementById('emailError');
+    const passwordError = document.getElementById('passwordError');
+
+    // Toggle Password Visibility
+    togglePasswordBtn.addEventListener('click', function () {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      this.querySelector('i').classList.toggle('fa-eye');
+      this.querySelector('i').classList.toggle('fa-eye-slash');
+    });
+
+    // Form Validation
+    function validateForm() {
+      let isValid = true;
+
+      // Email validation
+      if (!emailInput.value || !emailInput.checkValidity()) {
+        emailError.textContent = 'Please enter a valid email address';
+        emailError.style.display = 'block';
+        emailInput.classList.add('is-invalid');
+        isValid = false;
+      } else {
+        emailError.style.display = 'none';
+        emailInput.classList.remove('is-invalid');
+      }
+
+      // Password validation
+      if (!passwordInput.value || passwordInput.value.length < 6) {
+        passwordError.textContent = 'Password must be at least 6 characters';
+        passwordError.style.display = 'block';
+        passwordInput.classList.add('is-invalid');
+        isValid = false;
+      } else {
+        passwordError.style.display = 'none';
+        passwordInput.classList.remove('is-invalid');
+      }
+
+      return isValid;
+    }
+
+    // Real-time validation
+    emailInput.addEventListener('input', () => {
+      if (emailInput.checkValidity()) {
+        emailError.style.display = 'none';
+        emailInput.classList.remove('is-invalid');
+      }
+    });
+
+    passwordInput.addEventListener('input', () => {
+      if (passwordInput.value.length >= 6) {
+        passwordError.style.display = 'none';
+        passwordInput.classList.remove('is-invalid');
+      }
+    });
+
+    // Form Submission
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (!validateForm()) return;
+
+      // Show loading state
+      loginBtn.classList.add('d-none');
+      loadingSpinner.classList.remove('d-none');
+      errorAlert.classList.add('d-none');
+
+      try {
+        // Login user
+        const { user } = await loginUser(emailInput.value, passwordInput.value);
+
+        // Get user role
+        const { data: profile, error } = await supabase
+          .from("profiles")
+          .select("role, full_name")
+          .eq("id", user.id)
+          .single();
+
+        if (error) throw error;
+
+        // Store user info in sessionStorage
+        sessionStorage.setItem('chama_user_role', profile.role);
+        sessionStorage.setItem('chama_user_name', profile.full_name);
+
+        // Check if user is active
+        const { data: memberStatus } = await supabase
+          .from("profiles")
+          .select("is_active")
+          .eq("id", (await supabase.auth.getUser()).data.user.id)
+          .single();
+
+        if (!memberStatus?.is_active) {
+          throw new Error("Your account is inactive. Please contact the administrator.");
+        }
+
+        // Role-based redirect (use absolute path to frontend dashboards)
+        setTimeout(() => {
+          window.location.href = `/frontend/dashboards/${profile.role}/dashboard.html`;
+        }, 500);
+
+      } catch (err) {
+        // Show error
+        errorMessage.textContent = err.message || 'Login failed. Please check your credentials.';
+        errorAlert.classList.remove('d-none');
+
+        // Reset loading state
+        loginBtn.classList.remove('d-none');
+        loadingSpinner.classList.add('d-none');
+      }
+    });
+
+    // Forgot Password functionality
+    document.getElementById('forgotPassword').addEventListener('click', async (e) => {
+      e.preventDefault();
+
+      const email = prompt('Please enter your email address to reset password:');
+      if (!email) return;
+
+      if (!email.includes('@') || !email.includes('.')) {
+        alert('Please enter a valid email address');
+        return;
+      }
+
+      try {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/reset-password.html`,
+        });
+
+        if (error) throw error;
+
+        alert('Password reset email sent! Please check your inbox.');
+      } catch (err) {
+        alert(`Error: ${err.message}`);
+      }
+    });
+
+    // Check for saved email
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedEmail = localStorage.getItem('chama_saved_email');
+      const rememberMe = localStorage.getItem('chama_remember_me');
+
+      if (savedEmail && rememberMe === 'true') {
+        emailInput.value = savedEmail;
+        document.getElementById('rememberMe').checked = true;
+      }
+    });
+
+    // Remember me functionality
+    document.getElementById('rememberMe').addEventListener('change', function () {
+      if (this.checked && emailInput.value) {
+        localStorage.setItem('chama_saved_email', emailInput.value);
+        localStorage.setItem('chama_remember_me', 'true');
+      } else {
+        localStorage.removeItem('chama_saved_email');
+        localStorage.removeItem('chama_remember_me');
+      }
+    });
+  </script>
+</body>
+
+</html>
