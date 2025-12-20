@@ -13,6 +13,10 @@ export async function registerUser(formData) {
   if (error) throw error;
 
   // 2. Create profile
+  // Try inserting a profile. Some Supabase setups create a profile automatically
+  // (e.g. via an auth.signup trigger) which would cause a unique constraint
+  // violation on `email`. In that case, try to detect the duplicate and proceed
+  // without throwing so registration doesn't fail unexpectedly.
   const { error: profileError } = await supabase.from("profiles").insert({
     id: data.user.id,
     full_name,
@@ -21,7 +25,30 @@ export async function registerUser(formData) {
     role
   });
 
-  if (profileError) throw profileError;
+  if (profileError) {
+    const msg = String(profileError.message || profileError);
+    // If profile already exists (unique constraint on email), try to read it.
+    if (msg.includes("profiles_email_key") || msg.toLowerCase().includes("unique")) {
+      const { data: existingProfile, error: fetchErr } = await supabase
+        .from("profiles")
+        .select("id, email")
+        .eq("email", email)
+        .maybeSingle();
+
+      if (fetchErr) throw fetchErr;
+
+      // If an existing profile was found, assume the profile was created
+      // automatically (by a DB trigger) and continue without throwing.
+      if (existingProfile) {
+        console.warn("Profile already exists for email; skipping insert.", email);
+      } else {
+        // If we didn't find an existing profile, rethrow the original error.
+        throw profileError;
+      }
+    } else {
+      throw profileError;
+    }
+  }
 
   // 3. If member, create member record
   if (role === "member") {
